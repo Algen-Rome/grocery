@@ -1,17 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SaleController;
+use App\Models\Product;
+
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $products = Product::all();
+    return view('pos', compact('products'));
 })->name('home');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+
+Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
