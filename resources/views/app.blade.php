@@ -1,18 +1,34 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-        <script src="https://cdn.tailwindcss.com"></script>
+    <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        
-    </head>
-    <body class="font-sans antialiased">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    @routes
+    @if(isset($page))
+        @viteReactRefresh
+        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        @inertiaHead
+    @endif
+
+
+</head>
+
+<body class="font-sans antialiased">
+    @if(View::hasSection('content'))
         @yield('content')
-    </body>
+    @else
+        <div id="app-root">
+            @inertia
+        </div>
+    @endif
+</body>
+
 </html>
