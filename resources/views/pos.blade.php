@@ -3,7 +3,7 @@
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
         <aside
-            class="w-64 bg-gradient-to-r from-red-500 via-yellow-500 to-violet-500 border-r border-gray-200 p-6 flex flex-col space-y-2">
+            class="w-64 border-r border-gray-200 p-6 flex flex-col space-y-2">
             <div class="mb-8 flex items-center space-x-3">
                 <div class="bg-emerald-300 rounded-full h-5 w-5"></div>
                 Grocery Admin
@@ -110,13 +110,26 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="py-2 px-4 border-b">order_id</td>
-                            <td class="py-2 px-4 border-b">customer_name</td>
-                            <td class="py-2 px-4 border-b">total</td>
-                            <td class="py-2 px-4 border-b"><span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full w-fit block ">Completed</span></td>
-                            <td class="py-2 px-4 border-b">date</td>
+                        @forelse($orders as $order)
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-2 px-4 border-b">#{{ $order->id }}</td>
+                            <td class="py-2 px-4 border-b">{{ $order->customer_name }}</td>
+                            <td class="py-2 px-4 border-b">₱{{ number_format($order->total_amount, 2) }}</td>
+                            <td class="py-2 px-4 border-b">
+                            @if($order->status === 'completed')
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full w-fit block uppercase tracking-wide">{{ ucfirst($order->status) }}</span>
+                            @else
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-black px-3 py-1 rounded-full w-fit block uppercase tracking-wide">{{ ucfirst($order->status) }}</span>
+                            @endif
+                            </td>
+                            <td class="py-2 px-4 border-b text-sm font-medium text-gray-400">{{ $order->created_at->format('M d, Y') }}</td>
                         </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-sm font-semibold text-gray-50/50">No recent orders registered in the system today.
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

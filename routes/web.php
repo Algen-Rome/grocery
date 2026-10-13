@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SaleController;
 use App\Models\Product;
+use App\Models\Order;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -13,7 +14,8 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/dashboard', function () {
         $products = Product::all();
-        return view('pos', compact('products'));
+        $orders = Order::latest()->take(5)->get();
+        return view('pos', compact('products','orders'));
     })->name('dashboard');
 
     // Secure transactional actions inside your protected authentication ring
