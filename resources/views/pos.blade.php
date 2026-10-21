@@ -2,8 +2,7 @@
 
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
-        <aside
-            class="w-64 border-r border-gray-200 p-6 flex flex-col space-y-2">
+        <aside class="w-64 border-r border-gray-200 p-6 flex flex-col space-y-2">
             <div class="mb-8 flex items-center space-x-3">
                 <div class="bg-emerald-300 rounded-full h-5 w-5"></div>
                 Grocery Admin
@@ -88,12 +87,19 @@
                 <div class="bg-white rounded-2xl lg:col-span-2 p-6 shadow-sm border border-gray-100">
                     <h2 class="text-lg font-black text-gray-900 mb-6">Sales Overview</h2>
                 </div>
+                <canvas id="salesChart" class="w-full h-48"></canvas>
                 <div class="flex flex-col bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <h2 class="text-lg font-black text-gray-900 mb-6">Top Products</h2>
                     <div class="flex flex-col gap-5">
-                        <h3 class="flex justify-between items-center py-1"><span class="font-extrabold text-gray-800 text-sm">banana</span><span class="font-black text-gray-500 text-sm">59</span></h3>
-                        <h3 class="flex justify-between items-center py-1"><span class="font-extrabold text-gray-800 text-sm">tomatoes</span><span class="font-black text-gray-500 text-sm">34</span></h3>
-                        <h3 class="flex justify-between items-center py-1"><span class="font-extrabold text-gray-800 text-sm">freshmilk</span><span class="font-black text-gray-500 text-sm">28</span></h3>
+                        <h3 class="flex justify-between items-center py-1"><span
+                                class="font-extrabold text-gray-800 text-sm">banana</span><span
+                                class="font-black text-gray-500 text-sm">59</span></h3>
+                        <h3 class="flex justify-between items-center py-1"><span
+                                class="font-extrabold text-gray-800 text-sm">tomatoes</span><span
+                                class="font-black text-gray-500 text-sm">34</span></h3>
+                        <h3 class="flex justify-between items-center py-1"><span
+                                class="font-extrabold text-gray-800 text-sm">freshmilk</span><span
+                                class="font-black text-gray-500 text-sm">28</span></h3>
                     </div>
                 </div>
             </div>
@@ -111,28 +117,81 @@
                     </thead>
                     <tbody>
                         @forelse($orders as $order)
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="py-2 px-4 border-b">#{{ $order->id }}</td>
-                            <td class="py-2 px-4 border-b">{{ $order->customer_name }}</td>
-                            <td class="py-2 px-4 border-b">₱{{ number_format($order->total_amount, 2) }}</td>
-                            <td class="py-2 px-4 border-b">
-                            @if($order->status === 'completed')
-                                <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full w-fit block uppercase tracking-wide">{{ ucfirst($order->status) }}</span>
-                            @else
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-black px-3 py-1 rounded-full w-fit block uppercase tracking-wide">{{ ucfirst($order->status) }}</span>
-                            @endif
-                            </td>
-                            <td class="py-2 px-4 border-b text-sm font-medium text-gray-400">{{ $order->created_at->format('M d, Y') }}</td>
-                        </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="py-2 px-4 border-b">#{{ $order->id }}</td>
+                                <td class="py-2 px-4 border-b">{{ $order->customer_name }}</td>
+                                <td class="py-2 px-4 border-b">₱{{ number_format($order->total_amount, 2) }}</td>
+                                <td class="py-2 px-4 border-b">
+                                <td class="py-2 px-4 border-b">
+                                    @if(strtolower($order->status) === 'completed')
+                                        <span
+                                            class="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full w-fit block uppercase tracking-wide">
+                                            {{ ucfirst($order->status) }}
+                                        </span>
+                                    @else
+                                        <span
+                                            class="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1 rounded-full w-fit block uppercase tracking-wide">
+                                            {{ ucfirst($order->status) }}
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td class="py-2 px-4 border-b text-sm font-medium text-gray-400">
+                                    {{ $order->created_at->format('M d, Y') }}
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="5" class="py-8 text-center text-sm font-semibold text-gray-50/50">No recent orders registered in the system today.
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-sm font-semibold text-gray-50/50">No recent orders
+                                    registered in the system today.
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
+    <script src="https://jsdelivr.net"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line', data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Weekly Revenue',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000, 28450],
+                        borderColor: '#065f46',
+                        backgroundColor: 'rgba(6, 95, 70, 0.05)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f5f9'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 @endsection
