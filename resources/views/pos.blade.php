@@ -45,7 +45,7 @@
                     class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition hover:shadow-md h-32">
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Sales</p>
-                        <h3 class="text-3xl font-black text-gray-900 mt-2">₱128,450</h3>
+                        <h3 class="text-3xl font-black text-gray-900 mt-2">₱{{ number_format($totalSales, 2) }}</h3>
                     </div>
                     <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
                         ↑ +12.5% <span class="text-gray-400 font-normal ml-1">vs yesterday</span>
@@ -55,7 +55,7 @@
                     class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition hover:shadow-md h-32">
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Orders Today</p>
-                        <h3 class="text-3xl font-black text-gray-900 mt-2">342</h3>
+                        <h3 class="text-3xl font-black text-gray-900 mt-2">{{ $ordersToday }}</h3>
                     </div>
                     <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
                         ↑ +8.2% <span class="text-gray-400 font-normal ml-1">new checkouts</span>
@@ -65,17 +65,22 @@
                     class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition hover:shadow-md h-32">
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Products</p>
-                        <h3 class="text-3xl font-black text-gray-900 mt-2">1,205</h3>
+                        <h3 class="text-3xl font-black text-gray-900 mt-2">{{ number_format($totalProducts) }}</h3>
                     </div>
                     <div class="text-xs font-bold text-amber-500 mt-2 flex items-center">
-                        ⚠️ 12 Items <span class="text-gray-400 font-normal ml-1">low stock alerts</span>
+                        @if ($lowStockCount > 0)
+                            ⚠️ {{ $lowStockCount }} {{ str::plural('item', $lowStockCount) }} <span
+                                class="text-gray-400 font-normal ml-1">low stock alerts</span>
+                        @else
+                            <span class="text-emerald-400 font-bold ml-1">✅ All products in stock</span>
+                        @endif
                     </div>
                 </div>
                 <div
                     class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition hover:shadow-md h-32">
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Customers</p>
-                        <h3 class="text-3xl font-black text-gray-900 mt-2">89</h3>
+                        <h3 class="text-3xl font-black text-gray-900 mt-2">{{ $activeCustomers }}</h3>
                     </div>
                     <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
                         ↑ +4.1% <span class="text-gray-400 font-normal ml-1">active sessions</span>
@@ -91,15 +96,13 @@
                 <div class="flex flex-col bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <h2 class="text-lg font-black text-gray-900 mb-6">Top Products</h2>
                     <div class="flex flex-col gap-5">
-                        <h3 class="flex justify-between items-center py-1"><span
-                                class="font-extrabold text-gray-800 text-sm">banana</span><span
-                                class="font-black text-gray-500 text-sm">59</span></h3>
-                        <h3 class="flex justify-between items-center py-1"><span
-                                class="font-extrabold text-gray-800 text-sm">tomatoes</span><span
-                                class="font-black text-gray-500 text-sm">34</span></h3>
-                        <h3 class="flex justify-between items-center py-1"><span
-                                class="font-extrabold text-gray-800 text-sm">freshmilk</span><span
-                                class="font-black text-gray-500 text-sm">28</span></h3>
+                        @forelse($topProducts as $item)
+                            <h3 class="flex justify-between items-center py-1"><span
+                                    class="font-extrabold text-gray-800 text-sm">{{ $item->product_name }}</span><span
+                                    class="font-black text-gray-500 text-sm">{{ $item->total_sold ?? 0}}</span></h3>
+                        @empty
+                            <p class="text-gray-500">No top products found.</p>
+                        @endforelse
                     </div>
                 </div>
             </div>
