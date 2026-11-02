@@ -1,4 +1,5 @@
-@extends('app')
+@extends('layouts.blade-layout')
+
 
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
@@ -8,8 +9,8 @@
                 <span class="text-lg font-black text-gray-900 tracking-wide">Grocery Admin</span>
             </div>
             <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Dashboard</a>
-            <a href="#" class="bg-emerald-800 text-white px-4 py-3 rounded-xl font-medium text-sm transition block shadow-sm">Sales</a>
-            <a href="#" class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Reports</a>
+            <a href="{{ route('sales.index') }}" class="bg-emerald-800 text-white px-4 py-3 rounded-xl font-medium text-sm transition block shadow-sm">Sales</a>
+            <a href="{{ route('reports.index') }}" class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Reports</a>
             <a href="#" class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Settings</a>
             <a href="#" class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Admin</a>
             <a href="#" class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Online Orders</a>
@@ -29,9 +30,9 @@
                 </div>
                 <div class="flex items-center space-x-6 ml-auto">
                     <span class="text-sm font-bold text-gray-700">Ana R.</span>
-                    <button class="bg-emerald-800 text-white font-black text-sm px-6 py-3 rounded-xl hover:bg-emerald-900 transition tracking-wide shadow-sm">+ New Sale</button>
                 </div>
             </div>
+            <button class="flex bg-emerald-800 text-white font-black text-sm px-6 py-3 rounded-xl hover:bg-emerald-900 transition tracking-wide shadow-sm">+ New Sale</button>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <select class="bg-white border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-400 focus:outline-none focus:border-emerald-500">
@@ -45,6 +46,7 @@
                 </select>
                 <input type="text" placeholder="Search orders" class="bg-white border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-400 focus:outline-none focus:border-emerald-500" />
             </div>
+            
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-gray-200/70 p-6 rounded-2xl flex flex-col justify-center items-center text-center h-28">

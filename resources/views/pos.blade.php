@@ -1,18 +1,19 @@
-@extends('app')
+@extends('layouts.blade-layout')
+
 
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
         <aside class="w-64 border-r border-gray-200 p-6 flex flex-col space-y-2">
             <div class="mb-8 flex items-center space-x-3">
-                <div class="bg-emerald-300 rounded-full h-5 w-5"></div>
+                <div class="bg-emerald-600 rounded-full h-5 w-5"></div>
                 Grocery Admin
                 <span class="text-lg font-bold text-lg"></span>
             </div>
-            <a href="#"
+            <a href="{{ route('dashboard') }}"
                 class="bg-emerald-800 text-white px-4 py-3 rounded-xl font-medium text-sm transition block shadow-sm">Dashboard</a>
             <a href="{{ route('sales.index') }}"
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Sales</a>
-            <a href="#"
+            <a href="{{ route('reports.index') }}"
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Reports</a>
             <a href="#"
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Settings</a>
