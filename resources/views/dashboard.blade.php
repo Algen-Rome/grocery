@@ -34,7 +34,7 @@
         <main class="flex-1 p-8">
             <div class="flex justify-between items-center gap-10">
                 <h1 class="text-2xl font-black tracking-wide text-gray-900">DASHBOARD</h1>
-                <input type="text" placeholder="Search"
+                <input type="text" placeholder="Search"~
                     class="rounded-full bg-gray-300 px-6 py-2.5 w-[40rem] border border-transparent focus:outline-none focus:bg-white focus:border-emerald-500 transition" />
                 <div class="flex ml-auto bg-gray-400 rounded-full h-10 w-10 p-0"></div>
                 Admin Name
@@ -49,7 +49,7 @@
                         <h3 class="text-3xl font-black text-gray-900 mt-2">₱{{ number_format($totalSales, 2) }}</h3>
                     </div>
                     <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
-                        ↑ +12.5% <span class="text-gray-400 font-normal ml-1">vs yesterday</span>
+                    <p class="text-xs {{ $salesDiffColor }} font-bold mt-2">{{ $salesDiffText }}</p>
                     </div>
                 </div>
                 <div
@@ -69,8 +69,8 @@
                         <h3 class="text-3xl font-black text-gray-900 mt-2">{{ number_format($totalProducts) }}</h3>
                     </div>
                     <div class="text-xs font-bold text-amber-500 mt-2 flex items-center">
-                        @if ($lowStockCount > 0)
-                            ⚠️ {{ $lowStockCount }} {{ str::plural('item', $lowStockCount) }} <span
+                        @if ($lowStockCount <= 0)
+                            ⚠️ {{ $lowStockCount }} {{ str_contains('item', $lowStockCount) }} <span
                                 class="text-gray-400 font-normal ml-1">low stock alerts</span>
                         @else
                             <span class="text-emerald-400 font-bold ml-1">✅ All products in stock</span>
