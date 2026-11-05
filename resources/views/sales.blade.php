@@ -3,50 +3,8 @@
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
 
-        <!-- Sidebar Navigation Layout Panel -->
-        <aside class="w-64 border-r border-gray-200 p-6 flex flex-col space-y-2 bg-white">
-            <div class="mb-8 flex items-center space-x-3">
-                <div class="bg-emerald-600 rounded-full h-5 w-5"></div>
-                <span class="text-lg font-black text-gray-900 tracking-wide">Grocery Admin</span>
-            </div>
-            <a href="{{ route('dashboard') }}"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Dashboard</a>
-            <a href="{{ route('sales.index') }}"
-                class="bg-emerald-800 text-white px-4 py-3 rounded-xl font-medium text-sm transition block shadow-sm">Sales</a>
-            <a href="{{ route('reports.index') }}"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Reports</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Settings</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Admin</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Online
-                Orders</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Stock
-                Alerts</a>
-
-            <form action="{{ route('logout') }}" method="POST" class="w-full mt-auto">
-                @csrf
-                <button type="submit"
-                    class="w-full text-left text-red-500 hover:bg-red-50 font-medium px-4 py-3 rounded-xl text-sm block transition">Log
-                    Out</button>
-            </form>
-        </aside>
-
         <!-- Main Content Area Container Workspace -->
         <main class="flex-1 p-8">
-
-            <!-- Header Search Ribbon Row -->
-            <div class="flex justify-between items-center gap-10 mb-8">
-                <div class="flex items-center space-x-4">
-                    <input type="text" placeholder="Search..."
-                        class="rounded-full bg-gray-100 px-6 py-2.5 w-[25rem] border border-transparent focus:outline-none focus:bg-white focus:border-emerald-500 transition shadow-inner" />
-                </div>
-                <div class="flex items-center space-x-6 ml-auto">
-                    <span class="text-sm font-bold text-gray-700">Ana R.</span>
-                </div>
-            </div>
 
             <!-- Unified Control Ribbon Box Component (Dropdown Filters & Aligned Button) -->
             <div
@@ -128,26 +86,64 @@
                                     <td class="py-3.5 px-4 font-black text-gray-900">
                                         ₱{{ number_format($sale->total_amount, 2) }}</td>
 
-                                    <td class="py-3.5 px-4">
-                                        @if(strtolower($sale->status) === 'completed')
-                                            <span
-                                                class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide">Completed</span>
-                                        @elseif(strtolower($sale->status) === 'pending')
-                                            <span
-                                                class="bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide">Pending</span>
-                                        @else
-                                            <span
-                                                class="bg-sky-100 text-sky-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide">{{ $sale->status }}</span>
-                                        @endif
+                                    <td class="py-3.5 px-4 font-semibold text-sm">
+                                        @switch(strtolower($sale->status))
+                                            @case('completed')
+                                            @case('paid')
+                                                <!-- 🟢 Paid / Completed (Emerald Green Badge) -->
+                                                <span
+                                                    class="inline-block bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
+                                                    {{ $sale->status }}
+                                                </span>
+                                            @break
+
+                                            @case('pending')
+                                                <!-- 🟡 Pending (Amber Orange Badge) -->
+                                                <span
+                                                    class="inline-block bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
+                                                    Pending
+                                                </span>
+                                            @break
+
+                                            @case('refunded')
+                                                <!-- 🔘 Refunded (Slate Gray Badge) -->
+                                                <span
+                                                    class="inline-block bg-gray-200 text-gray-600 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
+                                                    Refunded
+                                                </span>
+                                            @break
+
+                                            @default
+                                                <!-- 🔵 Alternative Status Fallback Badge -->
+                                                <span
+                                                    class="inline-block bg-sky-100 text-sky-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
+                                                    {{ $sale->status }}
+                                                </span>
+                                        @endswitch
                                     </td>
 
                                     <td class="py-3.5 px-4 text-gray-400 font-medium">
                                         {{ $sale->created_at instanceof \Carbon\Carbon ? $sale->created_at->format('M d, Y') : date('M d, Y', strtotime($sale->created_at)) }}
                                     </td>
                                     <td class="py-3.5 px-4 text-center">
-                                        <a href="#"
-                                            class="text-xs font-black text-emerald-600 hover:text-emerald-700 underline tracking-wide transition">View</a>
-                                    </td>
+    <div class="flex items-center justify-center space-x-3">
+        <!-- View Popup Action Trigger Link Button -->
+        <a href="#" data-id="{{ $sale->id }}" class="text-xs font-black text-emerald-600 hover:text-emerald-700 underline tracking-wide transition trigger-view-modal-btn">
+            View
+        </a>
+        
+        <span class="text-gray-300">|</span>
+        
+        <!-- Secure Deletion Request Endpoint Form Post Payload -->
+        <form action="{{ route('sales.destroy', $sale->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to permanently delete this order record? This cannot be undone.');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="text-xs font-black text-rose-500 hover:text-rose-700 underline tracking-wide transition">
+                Delete
+            </button>
+        </form>
+    </div>
+</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -160,5 +156,151 @@
                     </table>
                 </div>
             </div>
+            <!-- 🌟 Floating Order Details Overlay Modal Component Section Layer -->
+            <div id="order-details-modal"
+                class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50 transition duration-150 p-4">
+                <div
+                    class="bg-white border border-gray-100 w-full max-w-lg rounded-2xl p-6 shadow-xl transform scale-95 transition-all duration-200">
+
+                    <!-- Header Info Row -->
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+                        <div>
+                            <h3 class="text-base font-black text-gray-900 tracking-wide">Order Receipt <span
+                                    id="modal-order-id" class="text-emerald-700">#00</span></h3>
+                            <p id="modal-order-date" class="text-[11px] font-bold text-gray-400 mt-0.5">Nov 05, 2026</p>
+                        </div>
+                        <button type="button" id="close-modal-btn"
+                            class="text-gray-400 hover:text-gray-600 font-bold text-sm bg-gray-50 hover:bg-gray-100 p-2 rounded-xl transition">✕
+                            Close</button>
+                    </div>
+
+                    <!-- Customer & Order Context Telemetry Details Sheet -->
+                    <div
+                        class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-4 space-y-2 text-xs font-semibold text-gray-600">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Cashier Store Admin:</span>
+                            <span class="text-gray-800 font-bold">Ana R.</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Customer Name Target:</span>
+                            <span id="modal-customer" class="text-gray-900 font-black">Maria Santos</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Transaction Status:</span>
+                            <span id="modal-status"
+                                class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wide">COMPLETED</span>
+                        </div>
+                    </div>
+
+                    <!-- Purchased Product Matrix Spreadsheet Table Section -->
+                    <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2">Basket Breakdowns</h4>
+                    <div class="border border-gray-100 rounded-xl overflow-hidden mb-4 max-h-40 overflow-y-auto">
+                        <table class="w-full text-left text-xs font-semibold text-gray-700 border-collapse">
+                            <thead>
+                                <tr
+                                    class="bg-gray-50 text-[10px] text-gray-400 font-bold uppercase tracking-wider border-b border-gray-100">
+                                    <th class="py-2.5 px-4">Product Name</th>
+                                    <th class="py-2.5 px-4 text-center">Qty</th>
+                                    <th class="py-2.5 px-4 text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-items-rows" class="divide-y divide-gray-50 bg-white">
+                                <!-- Dynamic product data loops rows map inside here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Grand Total Summary Banner Board Container -->
+                    <div
+                        class="flex justify-between items-center pt-3 border-t border-gray-100 font-black text-sm text-gray-900">
+                        <span class="text-gray-400 text-xs font-bold uppercase tracking-wide">Grand Total Collected</span>
+                        <span id="modal-total-amt" class="text-lg text-gray-900 font-black">₱0.00</span>
+                    </div>
+
+                </div>
+            </div>
+
         </main>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('order-details-modal');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const itemsRows = document.getElementById('modal-items-rows');
+
+        // Attach ajax loaders to every row line item view action button
+        document.querySelectorAll('.trigger-view-modal-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const orderId = this.getAttribute('data-id');
+
+                // Trigger secure background async fetch query lookup metrics
+                fetch(`/sales/${orderId}/json`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) return alert(data.error);
+
+                        // Map string variables cleanly onto DOM receipt elements variables
+                        document.getElementById('modal-order-id').innerText = '#' + data.order_id;
+                        document.getElementById('modal-order-date').innerText = data.date;
+                        document.getElementById('modal-customer').innerText = data.customer_name;
+                        document.getElementById('modal-total-amt').innerText = '₱' + data.total_amount;
+
+                        // Render status badges with proper coloring layout matching contextual parameters
+                        const statusEl = document.getElementById('modal-status');
+                        statusEl.innerText = data.status.toUpperCase();
+
+                        // 🌟 Inside your fetch().then(data => { ... }) loop block, replace 'const statusEl...' with this:
+                        statusEl.className =
+                            'text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wide text-center';
+
+                        const normalizedStatus = data.status.toLowerCase();
+                        if (normalizedStatus === 'completed' || normalizedStatus === 'paid') {
+                            statusEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                        } else if (normalizedStatus === 'pending') {
+                            statusEl.classList.add('bg-amber-100', 'text-amber-800');
+                        } else if (normalizedStatus === 'refunded') {
+                            statusEl.classList.add('bg-gray-200', 'text-gray-600');
+                        } else {
+                            statusEl.classList.add('bg-sky-100', 'text-sky-800');
+                        }
+
+                        itemsRows.innerHTML = ''; // wipe loading structures clean
+
+                        // Loop through the purchases list
+                        data.items.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.className = "hover:bg-slate-50/40 transition font-medium text-gray-700";
+                            tr.innerHTML = `
+                                <td class="py-2.5 px-4 font-bold text-gray-900">${item.name}</td>
+                                <td class="py-2.5 px-4 text-center font-bold text-gray-400">${item.qty}</td>
+                                <td class="py-2.5 px-4 text-right font-black text-gray-900">₱${parseFloat(item.price * item.qty).toFixed(2)}</td>
+                            `;
+                            itemsRows.appendChild(tr);
+                        });
+
+                        // Transition active state visibility layer classes on screen
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    })
+                    .catch(() => alert('Could not parse transaction telemetry logs details.'));
+            });
+        });
+
+        // Close buttons behaviors triggers handlers
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        });
+    });
+</script>

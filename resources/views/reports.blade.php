@@ -2,36 +2,6 @@
 
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
-
-        <aside class="w-64 border-r border-gray-200 p-6 flex flex-col space-y-2 bg-white">
-            <div class="mb-8 flex items-center space-x-3">
-                <div class="bg-emerald-600 rounded-full h-5 w-5"></div>
-                <span class="text-lg font-black text-gray-900 tracking-wide">Grocery Admin</span>
-            </div>
-            <a href="{{ route('dashboard') }}"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Dashboard</a>
-            <a href="{{ route('sales.index') }}"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Sales</a>
-            <a href="#"
-                class="bg-emerald-800 text-white px-4 py-3 rounded-xl font-medium text-sm transition block shadow-sm">Reports</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Settings</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Admin</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Online
-                Orders</a>
-            <a href="#"
-                class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Stock
-                Alerts</a>
-
-            <form action="{{ route('logout') }}" method="POST" class="w-full mt-auto">
-                @csrf
-                <button type="submit"
-                    class="w-full text-left text-red-500 hover:bg-red-50 font-medium px-4 py-3 rounded-xl text-sm block transition">Log
-                    Out</button>
-            </form>
-        </aside>
         <main class="flex-1 p-8">
 
             <div class="flex justify-between items-center gap-10 mb-6">
