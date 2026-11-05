@@ -15,7 +15,7 @@
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Sales</a>
             <a href="{{ route('reports.index') }}"
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Reports</a>
-            <a href="#"
+            <a href="   "
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Settings</a>
             <a href="#"
                 class="text-gray-500 hover:text-gray-900 hover:bg-slate-100 px-4 py-3 rounded-xl font-medium text-sm transition block">Admin</a>
@@ -34,7 +34,7 @@
         <main class="flex-1 p-8">
             <div class="flex justify-between items-center gap-10">
                 <h1 class="text-2xl font-black tracking-wide text-gray-900">DASHBOARD</h1>
-                <input type="text" placeholder="Search"~
+                <input type="text" placeholder="Search" ~
                     class="rounded-full bg-gray-300 px-6 py-2.5 w-[40rem] border border-transparent focus:outline-none focus:bg-white focus:border-emerald-500 transition" />
                 <div class="flex ml-auto bg-gray-400 rounded-full h-10 w-10 p-0"></div>
                 Admin Name
@@ -49,7 +49,7 @@
                         <h3 class="text-3xl font-black text-gray-900 mt-2">₱{{ number_format($totalSales, 2) }}</h3>
                     </div>
                     <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
-                    <p class="text-xs {{ $salesDiffColor }} font-bold mt-2">{{ $salesDiffText }}</p>
+                        <p class="text-xs {{ $salesDiffColor }} font-bold mt-2">{{ $salesDiffText }}</p>
                     </div>
                 </div>
                 <div
@@ -58,8 +58,12 @@
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Orders Today</p>
                         <h3 class="text-3xl font-black text-gray-900 mt-2">{{ $ordersToday }}</h3>
                     </div>
-                    <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
-                        ↑ +8.2% <span class="text-gray-400 font-normal ml-1">new checkouts</span>
+                    <div
+                        class="text-xs font-bold mt-2 flex items-center {{ str_contains($ordersTrend, '-') || str_contains($ordersTrend, 'No') ? 'text-rose-600' : 'text-emerald-600' }}">
+                        <span>
+                            {{ str_contains($ordersTrend, '-') ? '↓' : (str_contains($ordersTrend, 'No') ? '' : '↑') }}
+                            {{ $ordersTrend }}
+                        </span>
                     </div>
                 </div>
                 <div
@@ -83,29 +87,65 @@
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Customers</p>
                         <h3 class="text-3xl font-black text-gray-900 mt-2">{{ $activeCustomers }}</h3>
                     </div>
-                    <div class="text-xs font-bold text-emerald-600 mt-2 flex items-center">
-                        ↑ +4.1% <span class="text-gray-400 font-normal ml-1">active sessions</span>
+                    <div
+                        class="text-xs font-bold mt-2 flex items-center {{ str_contains($customerTrend, '-') || str_contains($customerTrend, '0 active') ? 'text-rose-600' : 'text-emerald-600' }}">
+                        <span>
+                            {{ str_contains($customerTrend, '-') ? '↓' : (str_contains($customerTrend, '0 active') ? '' : '↑') }}
+                            {{ $customerTrend }}
+                        </span>
                     </div>
                 </div>
 
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-2xl lg:col-span-2 p-6 shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-black text-gray-900 mb-6">Sales Overview</h2>
+            <div class="flex flex-col lg:flex-row gap-6 mt-6">
+
+                <div
+                    class="w-full lg:w-2/3 bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-800 mb-1">Sales Overview</h3>
+                        <p class="text-xs text-gray-400 mb-4">Completed revenue totals for the last 7 days</p>
+                    </div>
+
+                    <div class="h-64 flex items-end justify-between gap-3 bg-gray-50 p-6 rounded-lg border border-gray-100">
+                        @foreach($chartData as $data)
+                            <div class="flex flex-col items-center flex-1 h-full justify-end group relative">
+                                <div
+                                    class="absolute -top-8 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-sm z-10">
+                                    ₱{{ number_format($data['sales'], 2) }}
+                                </div>
+
+                                <div class="w-full rounded-t transition-all duration-500 {{ $data['day_name'] === date('D') ? 'bg-emerald-600' : 'bg-emerald-200 group-hover:bg-emerald-300' }}"
+                                    style="height: {{ $data['height'] }}%;">
+                                </div>
+
+                                <span
+                                    class="text-[11px] font-medium text-gray-400 mt-2 uppercase tracking-wider">{{ $data['day_name'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-                <canvas id="salesChart" class="w-full h-48"></canvas>
-                <div class="flex flex-col bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-black text-gray-900 mb-6">Top Products</h2>
-                    <div class="flex flex-col gap-5">
-                        @forelse($topProducts as $item)
-                            <h3 class="flex justify-between items-center py-1"><span
-                                    class="font-extrabold text-gray-800 text-sm">{{ $item->product_name }}</span><span
-                                    class="font-black text-gray-500 text-sm">{{ $item->total_sold ?? 0}}</span></h3>
+
+                <div
+                    class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-800 mb-1">Top Products</h3>
+                        <p class="text-xs text-gray-400 mb-4">Store product inventory reference list</p>
+                    </div>
+
+                    <div class="space-y-4 h-full flex flex-col justify-center">
+                        @forelse($topProducts as $product)
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-2 last:border-none">
+                                <span
+                                    class="text-sm font-medium text-gray-700">{{ $product->product_name ?? ($product->name ?? 'Unnamed Item') }}</span>
+                                <span
+                                    class="text-sm font-bold text-emerald-600">₱{{ number_format($product->price ?? 0, 2) }}</span>
+                            </div>
                         @empty
-                            <p class="text-gray-500">No top products found.</p>
+                            <p class="text-sm text-gray-400 text-center py-4">No products found.</p>
                         @endforelse
                     </div>
                 </div>
+
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mt-6">
                 <h2 class="text-lg font-black text-gray-900 mb-6">Recent Orders</h2>

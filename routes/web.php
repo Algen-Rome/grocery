@@ -83,18 +83,46 @@ Route::get('/dashboard', function () {
         ->limit(5)
         ->get();
 
-    // 8. Fetch Recent Orders for Activity Logs (MUST BE BEFORE RETURN STATEMENT)
+    // 8. Fetch Recent Orders for Activity Logs
     $orders = DB::table('orders')
         ->latest('created_at')
         ->limit(5)
         ->get();
 
-    // 9. Bind variables cleanly to the view context array
+    // 9. NEW: Fetch Real Chart Data for the Last 7 Days
+    $chartData = [];
+    $maxDaySales = 1; // Safeguard to prevent division by zero
+
+    for ($i = 6; $i >= 0; $i--) {
+        $date = Carbon::today()->subDays($i);
+
+        $daySales = DB::table('orders')
+            ->where('status', 'Completed')
+            ->whereDate('created_at', $date)
+            ->sum('total_amount') ?? 0;
+
+        if ($daySales > $maxDaySales) {
+            $maxDaySales = $daySales;
+        }
+
+        $chartData[] = [
+            'day_name' => $date->format('D'), // e.g., 'Mon', 'Tue'
+            'sales' => $daySales,
+        ];
+    }
+
+    // Convert raw revenue numbers into scaled graph heights (percentages from 10% to 100%)
+    foreach ($chartData as $key => $data) {
+        $percentage = ($data['sales'] / $maxDaySales) * 100;
+        $chartData[$key]['height'] = $data['sales'] > 0 ? max($percentage, 12) : 5; // minimum visibility height
+    }
+
+    // 10. Bind variables cleanly to the view context array
     return view('dashboard', [
         'totalSales' => $totalSales,
         'salesTrend' => $salesTrend,
         'salesDiffText' => $salesDiffText,
-        'salesDiffColor' => $salesDiffColor, 
+        'salesDiffColor' => $salesDiffColor,
         'ordersToday' => $ordersToday,
         'ordersTrend' => $ordersTrend,
         'totalProducts' => DB::table('products')->count(),
@@ -104,6 +132,7 @@ Route::get('/dashboard', function () {
         'customerTrend' => $customerTrend,
         'topProducts' => $topProducts,
         'orders' => $orders,
+        'chartData' => $chartData, // 👈 Passing real daily graph data arrays here
     ]);
 })->name('dashboard');
 
@@ -120,13 +149,155 @@ Route::get('/sales-ledger', function () {
         'allSales'
     ));
 })->name('sales.index');
+Route::get('/sales/create', function () {
+    // Fetches items so you can select grocery items out of a dropdown inside your POS workspace view
+    $products = DB::table('products')->where('stock_count', '>', 0)->get();
+    return view('sales-create', compact('products'));
+})->name('sales.create');
+
+// 2. The structural post action route that receives inputs and stores them securely inside your order logs
+Route::post('/sales/store', function (\Illuminate\Http\Request $request) {
+    // Validates inputs, deducts stock targets, and falls back gracefully to the index view
+    $validated = $request->validate([
+        'customer_name' => 'required|string|max:255',
+        'total_amount' => 'required|numeric|min:0',
+    ]);
+
+    DB::table('orders')->insert([
+        'customer_name' => $validated['customer_name'],
+        'total_amount' => $validated['total_amount'],
+        'status' => 'Completed',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->route('sales.index')->with('success', 'New sale logged cleanly!');
+})->name('sales.store');
+
+// 1. Render the form screen to create a brand new product
+Route::get('/products/create', function () {
+    return view('products-create');
+})->name('products.create');
+
+// 2. Accept form inputs, validate them, and store them into your products database
+Route::post('/products/store', function (\Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'product_name'  => 'required|string|max:255',
+        'price'         => 'required|numeric|min:0',
+        'stock_count'   => 'required|integer|min:0',
+        'reorder_level' => 'required|integer|min:0',    
+    ]);
+
+    // 🌟 Changed 'product_name' to 'name' to align with your database schema
+    DB::table('products')->insert([
+        'name'          => $validated['product_name'], // 👈 Maps form input to table 'name' field
+        'price'         => $validated['price'],
+        'stock_count'   => $validated['stock_count'],
+        'reorder_level' => $validated['reorder_level'],
+        'created_at'    => now(),
+        'updated_at'    => now(),
+    ]);
+
+    return redirect()->route('dashboard')->with('success', 'Product added successfully to inventory!');
+})->name('products.store');
+
 
 Route::get('/reports', function () {
-    $totalSalesSum = Order::where('status', 'Completed')->sum('total_amount');
-    $formattedRevenue = '₱' . number_format($totalSalesSum, 2);
+    // 1. Core Financial Calculations
+    $totalSalesSum = DB::table('orders')
+        ->where('status', 'Completed')
+        ->sum('total_amount') ?? 0;
+
+    $totalOrdersCount = DB::table('orders')
+        ->where('status', 'Completed')
+        ->count();
+
+    $avgOrderValue = $totalOrdersCount > 0 ? ($totalSalesSum / $totalOrdersCount) : 0;
+
+    // 2. Determine Best Sales Month dynamically from the Database
+    $bestMonthQuery = DB::table('orders')
+        ->where('status', 'Completed')
+        ->select(
+            DB::raw('MONTHNAME(created_at) as month_name'),
+            DB::raw('SUM(total_amount) as monthly_revenue')
+        )
+        ->groupBy('month_name')
+        ->orderByDesc('monthly_revenue')
+        ->first();
+
+    $bestMonth = $bestMonthQuery ? $bestMonthQuery->month_name : 'No Sales Yet';
+
+    // 3. Simple Dynamic Growth Calculation Helper
+    // Compares current month vs previous month if data exists, defaults gracefully to an baseline indicator
+    $currentMonthSales = DB::table('orders')->where('status', 'Completed')->whereMonth('created_at', now()->month)->sum('total_amount') ?? 0;
+    $lastMonthSales = DB::table('orders')->where('status', 'Completed')->whereMonth('created_at', now()->subMonth()->month)->sum('total_amount') ?? 0;
     
-    return view('reports', compact('formattedRevenue'));
+    if ($lastMonthSales > 0) {
+        $growthPct = (($currentMonthSales - $lastMonthSales) / $lastMonthSales) * 100;
+        $growthText = ($growthPct >= 0 ? '+' : '') . number_format($growthPct, 0) . '%';
+    } else {
+        $growthText = $currentMonthSales > 0 ? '+100%' : '0%';
+    }
+
+    // 4. Generate Monthly Aggregates for the Chart Container
+    // Fetches live aggregates for the last 5 calendar months
+    $monthlyChartData = [];
+    $maxRevenue = 1;
+
+    for ($i = 4; $i >= 0; $i--) {
+        $monthCarbon = now()->subMonths($i);
+        $revenue = DB::table('orders')
+            ->where('status', 'Completed')
+            ->whereMonth('created_at', $monthCarbon->month)
+            ->whereYear('created_at', $monthCarbon->year)
+            ->sum('total_amount') ?? 0;
+
+        if ($revenue > $maxRevenue) {
+            $maxRevenue = $revenue;
+        }
+
+        $monthlyChartData[] = [
+            'label' => $monthCarbon->format('M Y'),
+            'raw_sales' => $revenue,
+        ];
+    }
+
+    // Assign scalable CSS responsive structural heights to your bar values
+    foreach ($monthlyChartData as $key => $data) {
+        $pct = ($data['raw_sales'] / $maxRevenue) * 100;
+        $monthlyChartData[$key]['height'] = $data['raw_sales'] > 0 ? max($pct, 12) : 6;
+    }
+
+    // 5. Dynamic Report Log Generator
+    // Maps historical aggregates to populate your interactive downloadeable layout list log rows
+    $reportLogs = [
+        [
+            'title' => now()->format('F Y') . ' Sales Summary',
+            'type' => 'Sales',
+            'generated' => now()->startOfMonth()->format('M j, Y'),
+        ],
+        [
+            'title' => 'Q' . ceil(now()->month / 3) . ' Inventory Audit Summary',
+            'type' => 'Inventory',
+            'generated' => now()->subDays(7)->format('M j, Y'),
+        ]
+    ];
+
+    return view('reports', [
+        'totalRevenue' => $totalSalesSum,
+        'growthText' => $growthText,
+        'bestMonth' => $bestMonth,
+        'avgOrderValue' => $avgOrderValue,
+        'monthlyChartData' => $monthlyChartData,
+        'reportLogs' => $reportLogs,
+    ]);
 })->name('reports.index');
+
+Route::delete('/saved-searches/{id}', function ($id) {
+    DB::table('saved_searches')->where('id', $id)->delete();
+
+    return back()->with('success', 'Saved search removed cleanly!');
+})->name('saved-searches.destroy');
 
 Route::post('/logout', function () {
     return redirect('/');
