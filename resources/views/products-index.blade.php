@@ -6,21 +6,11 @@
         <!-- Main Working Canvas -->
         <main class="flex-1 p-8">
 
-             <!-- Top Header Ribbon Bar Component -->
-            <div class="flex justify-between items-center gap-10 mb-2">
-                <input type="text" placeholder="Search..."
-                    class="rounded-full bg-gray-200 px-6 py-2.5 w-[25rem] border border-transparent focus:outline-none focus:bg-white focus:border-emerald-500 transition shadow-inner text-sm font-semibold" />
-                <div class="flex items-center space-x-4 ml-auto">
-                    <div class="h-8 w-8 bg-gray-300 rounded-full"></div>
-                    <span class="text-sm font-bold text-gray-700">Ana R.</span>
-                </div>
-            </div>
-
             <!-- 🌟 MOCKUP REALIGNMENT: Floats the button directly on the right margin below the staff name -->
             <div class="flex justify-end mb-6">
                 <button type="button" 
                         onclick="toggleAddProductModal()" 
-                        class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-sm transition border-0 cursor-pointer tracking-wide">
+                        class="px-10 py-4 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm rounded-xl shadow-sm transition border-0 cursor-pointer tracking-wide">
                     +Add Products
                 </button>
             </div>

@@ -4,15 +4,6 @@
     <div class="flex min-h-screen bg-slate-50">
         <main class="flex-1 p-8">
 
-            <div class="flex justify-between items-center gap-10 mb-6">
-                <h1 class="text-2xl font-black tracking-wide text-gray-900">REPORTS</h1>
-                <input type="text" placeholder="Search..."
-                    class="rounded-full bg-gray-100 px-6 py-2.5 w-[25rem] border border-transparent focus:outline-none focus:bg-white focus:border-emerald-500 transition shadow-inner" />
-                <div class="flex items-center space-x-3 ml-auto">
-                    <span class="text-sm font-bold text-gray-700">Ana R.</span>
-                </div>
-            </div>
-
             <div
                 class="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 shadow-sm">
                 <div class="flex flex-wrap gap-2">

@@ -75,7 +75,8 @@
                                                 <div>
                                                     <p class="text-xs font-bold text-slate-900 mb-0.5">{{ $product->name }}</p>
                                                     <p class="text-[10px] text-slate-400 font-semibold">Available Inventory:
-                                                        {{ $product->stock_count }} units</p>
+                                                        {{ $product->stock_count }} units
+                                                    </p>
                                                 </div>
                                                 <span
                                                     class="text-xs font-black text-emerald-600">₱{{ number_format($product->price, 2) }}</span>
@@ -251,16 +252,16 @@
             row.id = 'cart-item-' + itemId;
             row.className = 'border-b border-slate-100 align-middle';
             row.innerHTML = `
-            <td class="py-4 px-4 font-bold text-slate-900">${itemName}</td>
-            <td class="py-4 px-4">
-                <input type="number" value="1" min="1" oninput="updateRowSubtotal(${itemId}, ${itemPrice})" class="w-16 border border-slate-200 rounded-md p-1 text-center text-xs font-bold text-slate-800 focus:outline-none">
-            </td>
-            <td class="py-4 px-4 text-slate-500 font-medium">₱${itemPrice.toFixed(2)}</td>
-            <td class="py-4 px-4 font-bold text-slate-900 cart-row-subtotal-value" id="subtotal-${itemId}">₱${itemPrice.toFixed(2)}</td>
-            <td class="py-4 px-4 text-right">
-                <button type="button" onclick="this.closest('tr').remove(); calculateCartTotals();" class="text-rose-500 hover:text-rose-700 font-bold bg-transparent border-0 cursor-pointer">Remove</button>
-            </td>
-        `;
+                    <td class="py-4 px-4 font-bold text-slate-900">${itemName}</td>
+                    <td class="py-4 px-4">
+                        <input type="number" value="1" min="1" oninput="updateRowSubtotal(${itemId}, ${itemPrice})" class="w-16 border border-slate-200 rounded-md p-1 text-center text-xs font-bold text-slate-800 focus:outline-none">
+                    </td>
+                    <td class="py-4 px-4 text-slate-500 font-medium">₱${itemPrice.toFixed(2)}</td>
+                    <td class="py-4 px-4 font-bold text-slate-900 cart-row-subtotal-value" id="subtotal-${itemId}">₱${itemPrice.toFixed(2)}</td>
+                    <td class="py-4 px-4 text-right">
+                        <button type="button" onclick="this.closest('tr').remove(); calculateCartTotals();" class="text-rose-500 hover:text-rose-700 font-bold bg-transparent border-0 cursor-pointer">Remove</button>
+                    </td>
+                `;
 
             tbody.appendChild(row);
             cleanupPOSSearchState();
@@ -352,6 +353,89 @@
             const customMenu = document.getElementById('customDropdownMenu');
             if (searchContainer && !searchContainer.contains(event.target) && customMenu) {
                 customMenu.classList.add('hidden');
+            }
+        });
+        function calculateLiveChange(forcedSubtotal = null) {
+            let totalAmount = 0;
+
+            if (forcedSubtotal !== null) {
+                totalAmount = forcedSubtotal;
+            } else {
+                const totalElement = document.getElementById('summary-total');
+                const totalText = totalElement ? totalElement.innerText : '₱0.00';
+                totalAmount = parseFloat(totalText.replace('₱', '').replace(/,/g, '')) || 0;
+            }
+
+            const amountReceivedInput = document.getElementById('amount-received');
+            const amountReceived = parseFloat(amountReceivedInput ? amountReceivedInput.value : 0) || 0;
+
+            const changeDisplayField = document.getElementById('change-display');
+            const submitBtn = document.getElementById('submit-sale-btn');
+
+            if (changeDisplayField) {
+                // CASE 1: Cart is empty
+                if (totalAmount === 0) {
+                    changeDisplayField.innerText = '₱0.00';
+                    changeDisplayField.className = 'text-base font-black text-gray-900';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.className = 'w-full bg-slate-300 text-slate-500 font-black text-sm py-3.5 rounded-xl mt-8 block border-0 cursor-not-allowed text-center';
+                    }
+                }
+                // CASE 2: Insufficient payment amount entered
+                else if (amountReceived < totalAmount) {
+                    const shortAmount = totalAmount - amountReceived;
+                    changeDisplayField.innerText = 'Short: -₱' + shortAmount.toFixed(2);
+                    // Flash a red warning class onto the text string
+                    changeDisplayField.className = 'text-sm font-black text-rose-600 animate-pulse';
+
+                    // Disable submit button and turn it gray
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.className = 'w-full bg-slate-300 text-slate-500 font-black text-sm py-3.5 rounded-xl mt-8 block border-0 cursor-not-allowed text-center';
+                    }
+                }
+                // CASE 3: Payment is valid and sufficient
+                else {
+                    changeDisplayField.innerText = '₱' + (amountReceived - totalAmount).toFixed(2);
+                    changeDisplayField.className = 'text-base font-black text-emerald-600';
+
+                    // Enable button and restore emerald styling state
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm py-3.5 rounded-xl shadow-sm mt-8 block border-0 cursor-pointer text-center transition';
+                    }
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const salesForm = document.getElementById('sales-form');
+
+            if (salesForm) {
+                salesForm.addEventListener('submit', function (event) {
+                    // 1. Calculate active total amounts on checkout canvas
+                    const totalElement = document.getElementById('summary-total');
+                    const totalText = totalElement ? totalElement.innerText : '₱0.00';
+                    const totalAmount = parseFloat(totalText.replace('₱', '').replace(/,/g, '')) || 0;
+
+                    // 2. Fetch entered payment amount inputs
+                    const amountReceivedInput = document.getElementById('amount-received');
+                    const amountReceived = parseFloat(amountReceivedInput ? amountReceivedInput.value : 0) || 0;
+
+                    // 3. Block validation threshold if short
+                    if (amountReceived < totalAmount) {
+                        event.preventDefault(); // Stop form submission immediately
+                        alert('🛑 Cannot complete sale: The amount received (₱' + amountReceived.toFixed(2) + ') is less than the order total (₱' + totalAmount.toFixed(2) + '). Please provide full payment.');
+                        return false;
+                    }
+
+                    // 4. Block empty checkout carts
+                    if (totalAmount <= 0) {
+                        event.preventDefault();
+                        alert('🛑 Cannot complete sale: There are no items in the checkout cart ledger.');
+                        return false;
+                    }
+                });
             }
         });
     </script>
