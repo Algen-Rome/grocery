@@ -421,6 +421,10 @@ Route::delete('/products/{id}', function ($id) {
 
     return redirect()->route('sales.create')->with('success', 'Item cleared successfully from database tracking logs!');
 })->name('products.destroy');
+Route::delete('/sales/{id}/delete-record', function ($id) {
+    DB::table('orders')->where('id', $id)->delete();
+    return redirect()->route('sales.index')->with('success', 'Transaction ledger record successfully deleted!');
+})->name('sales.destroy');
 
 Route::post('/logout', function () {
     return redirect('/');
