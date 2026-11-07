@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema; // 🌟 MANDATORY FOR DATABASE SCHEMA CHECKS
+use Illuminate\Support\Facades\Schema;
+use Barryvdh\DomPDF\Facade\Pdf; // 🌟 MANDATORY FOR GENERATING PRINTS
 
 class ReportController extends Controller
 {
@@ -15,9 +16,9 @@ class ReportController extends Controller
     {
         // 1. Calculate Summary Aggregates
         $totalRevenue = DB::table('orders')->where('status', 'Completed')->sum('total_amount') ?? 0;
-        $growthPercent = 18;
+        $growthPercent = 18; 
         $bestMonth = 'August';
-
+        
         $orderCount = DB::table('orders')->where('status', 'Completed')->count();
         $avgOrderValue = $orderCount > 0 ? ($totalRevenue / $orderCount) : 0;
 
@@ -64,23 +65,22 @@ class ReportController extends Controller
             ->count();
 
         $rawStockValue = DB::table('products')->sum(DB::raw('stock_count * price')) ?? 0;
-
+        
         if ($rawStockValue >= 1000000) {
             $stockValueDisplay = '₱' . number_format($rawStockValue / 1000000, 1) . 'M';
         } else {
             $stockValueDisplay = '₱' . number_format($rawStockValue, 2);
         }
 
-        // 2. 🌟 INTELLIGENT SCANNER: Dynamic category grouping by analyzing item names live!
+        // 2. Dynamic category grouping by analyzing item names live
         $allProducts = DB::table('products')->select('name', 'stock_count')->get();
 
-        // Initialize category counters at 0
         $categoryStocks = [
             'Fruits & Vegetables' => 0,
-            'Dairy' => 0,
-            'Meat & Seafood' => 0,
-            'Beverages' => 0,
-            'Pantry & Canned' => 0,
+            'Dairy'               => 0,
+            'Meat & Seafood'      => 0,
+            'Beverages'           => 0,
+            'Pantry & Canned'     => 0,
         ];
 
         foreach ($allProducts as $product) {
@@ -96,7 +96,6 @@ class ReportController extends Controller
             } elseif (str_contains($name, 'soda') || str_contains($name, 'juice') || str_contains($name, 'coke') || str_contains($name, 'coffee') || str_contains($name, 'water')) {
                 $categoryStocks['Beverages'] += $qty;
             } else {
-                // Everything else defaults cleanly into Pantry items
                 $categoryStocks['Pantry & Canned'] += $qty;
             }
         }
@@ -115,5 +114,39 @@ class ReportController extends Controller
             'categoryStocks',
             'reportLogs'
         ));
+    }
+
+    /**
+     * Track C: Export Inventory PDF
+     */
+    public function exportPdf()
+    {
+        $totalProducts = DB::table('products')->count();
+
+        $lowStockItems = DB::table('products')
+            ->whereRaw('stock_count <= reorder_level')
+            ->where('stock_count', '>', 0)
+            ->count();
+
+        $outOfStock = DB::table('products')
+            ->where('stock_count', '<=', 0)
+            ->count();
+
+        $rawStockValue = DB::table('products')->sum(DB::raw('stock_count * price')) ?? 0;
+        $stockValueDisplay = '₱' . number_format($rawStockValue, 2);
+
+        $inventoryItems = DB::table('products')->orderBy('name', 'asc')->get();
+        $generatedAt = now()->format('M d, Y h:i A');
+
+        $pdf = Pdf::loadView('exports.inventory-pdf', compact(
+            'totalProducts',
+            'lowStockItems',
+            'outOfStock',
+            'stockValueDisplay',
+            'inventoryItems',
+            'generatedAt'
+        ));
+
+        return $pdf->download('inventory-report-' . now()->format('Y-m-d') . '.pdf');
     }
 }
