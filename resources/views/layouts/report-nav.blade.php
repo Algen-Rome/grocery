@@ -30,12 +30,15 @@
     </div>
 
     <!-- Action Date Ribbon Layout Summary Section Container -->
+    <!-- 📊 Find this block in layouts/report-nav.blade.php and change your button to an active anchor link route structure: -->
     <div class="flex items-center gap-3 self-end sm:self-auto">
         <span class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs shadow-inner">Sep 1 - Sep 14,
             2026</span>
-        <button type="button"
-            class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-black text-xs rounded-lg transition tracking-wide uppercase shadow-sm">
+
+        <!-- 🌟 LINK FIXED: Triggers the backend export controller generation engine script on click! -->
+        <a href="{{ route('reports.inventory.pdf') }}"
+            class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-black text-xs rounded-lg transition tracking-wide uppercase shadow-sm inline-block text-center no-underline">
             Export PDF
-        </button>
+        </a>
     </div>
 </div>

@@ -73,85 +73,76 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @forelse($allSales as $sale)
-                                <tr
-                                    class="hover:bg-slate-50/50 transition border-b border-gray-100 text-sm font-semibold text-gray-700">
-                                    <td class="py-3.5 px-4 text-gray-400">#{{ $sale->order_number ?? $sale->id }}</td>
-                                    <td class="py-3.5 px-4 text-gray-900 font-bold">{{ $sale->customer_name }}</td>
+                            @foreach($orders as $sale)
+                                <tr class="hover:bg-slate-50/50 transition text-sm font-semibold text-gray-700">
 
+                                    <!-- Column 1: Order ID Display -->
+                                    <td class="py-3.5 px-4 text-gray-400">
+                                        {{ $sale->order_number ?? '#' . $sale->id }}
+                                    </td>
+
+                                    <!-- Column 2: Customer Name -->
+                                    <td class="py-3.5 px-4 text-gray-900 font-bold">
+                                        {{ $sale->customer_name }}
+                                    </td>
+
+                                    <!-- Column 3: Items Count -->
                                     <td class="py-3.5 px-4 text-gray-500 font-medium">
-                                        {{ is_array(json_decode($sale->items ?? '')) ? count(json_decode($sale->items)) : rand(2, 6) }}
+                                        {{ is_array($sale->items) ? count($sale->items) : '0' }}
                                     </td>
 
+                                    <!-- Column 4: Total Amount -->
                                     <td class="py-3.5 px-4 font-black text-gray-900">
-                                        ₱{{ number_format($sale->total_amount, 2) }}</td>
+                                        ₱{{ number_format($sale->total_amount, 2) }}
+                                    </td>
 
+                                    <!-- Column 5: Status Badge -->
                                     <td class="py-3.5 px-4 font-semibold text-sm">
-                                        @switch(strtolower($sale->status))
-                                            @case('completed')
-                                            @case('paid')
-                                                <!-- 🟢 Paid / Completed (Emerald Green Badge) -->
-                                                <span
-                                                    class="inline-block bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
-                                                    {{ $sale->status }}
-                                                </span>
-                                            @break
-
-                                            @case('pending')
-                                                <!-- 🟡 Pending (Amber Orange Badge) -->
-                                                <span
-                                                    class="inline-block bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
-                                                    Pending
-                                                </span>
-                                            @break
-
-                                            @case('refunded')
-                                                <!-- 🔘 Refunded (Slate Gray Badge) -->
-                                                <span
-                                                    class="inline-block bg-gray-200 text-gray-600 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
-                                                    Refunded
-                                                </span>
-                                            @break
-
-                                            @default
-                                                <!-- 🔵 Alternative Status Fallback Badge -->
-                                                <span
-                                                    class="inline-block bg-sky-100 text-sky-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
-                                                    {{ $sale->status }}
-                                                </span>
-                                        @endswitch
+                                        @if(strtolower($sale->status ?? 'pending') === 'completed' || strtolower($sale->status ?? '') === 'paid')
+                                            <span
+                                                class="inline-block bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
+                                                {{ $sale->status }}
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-block bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
+                                                {{ $sale->status ?? 'Pending' }}
+                                            </span>
+                                        @endif
                                     </td>
 
-                                    <td class="py-3.5 px-4 text-gray-400 font-medium">
-                                        {{ $sale->created_at instanceof \Carbon\Carbon ? $sale->created_at->format('M d, Y') : date('M d, Y', strtotime($sale->created_at)) }}
+                                    <!-- Column 6: Date -->
+                                    <td class="py-3.5 px-4 text-gray-500 font-medium">
+                                        {{ $sale->created_at ? \Carbon\Carbon::parse($sale->created_at)->format('M d, Y g:i A') : 'N/A' }}
                                     </td>
-                                    <td class="py-3.5 px-4 text-center">
-    <div class="flex items-center justify-center space-x-3">
-        <!-- View Popup Action Trigger Link Button -->
-        <a href="#" data-id="{{ $sale->id }}" class="text-xs font-black text-emerald-600 hover:text-emerald-700 underline tracking-wide transition trigger-view-modal-btn">
-            View
-        </a>
-        
-        <span class="text-gray-300">|</span>
-        
-        <!-- Secure Deletion Request Endpoint Form Post Payload -->
-        <form action="{{ route('sales.destroy', $sale->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to permanently delete this order record? This cannot be undone.');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="text-xs font-black text-rose-500 hover:text-rose-700 underline tracking-wide transition">
-                Delete
-            </button>
-        </form>
-    </div>
-</td>
+
+                                    <!-- Column 7: Action (Placed exactly at the end to match the ACTION header!) -->
+                                    <td class="py-3.5 px-4 text-sm">
+                                        <div class="flex items-center gap-3">
+
+                                            <!-- Fixed View Link -->
+                                            <a href="{{ route('sales.show', $sale->id) }}"
+                                                class="text-emerald-600 hover:text-emerald-700 transition">
+                                                View
+                                            </a>
+
+                                            <!-- Fixed Delete Form Wrapper -->
+                                            <form action="{{ route('sales.destroy', $sale->id) }}" method="POST"
+                                                onsubmit="return confirm('Are you sure you want to delete this order?');"
+                                                class="inline m-0 p-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-500 hover:text-red-600 transition font-bold cursor-pointer bg-transparent border-0 p-0">
+                                                    Delete
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="py-8 text-center text-sm font-semibold text-gray-400 bg-gray-50/50">
-                                        No transaction logs found.
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -223,84 +214,84 @@
         </main>
 @endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('order-details-modal');
-        const closeBtn = document.getElementById('close-modal-btn');
-        const itemsRows = document.getElementById('modal-items-rows');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('order-details-modal');
+            const closeBtn = document.getElementById('close-modal-btn');
+            const itemsRows = document.getElementById('modal-items-rows');
 
-        // Attach ajax loaders to every row line item view action button
-        document.querySelectorAll('.trigger-view-modal-btn').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                const orderId = this.getAttribute('data-id');
+            // Attach ajax loaders to every row line item view action button
+            document.querySelectorAll('.trigger-view-modal-btn').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const orderId = this.getAttribute('data-id');
 
-                // Trigger secure background async fetch query lookup metrics
-                fetch(`/sales/${orderId}/json`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.error) return alert(data.error);
+                    // Trigger secure background async fetch query lookup metrics
+                    fetch(`/sales/${orderId}/json`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.error) return alert(data.error);
 
-                        // Map string variables cleanly onto DOM receipt elements variables
-                        document.getElementById('modal-order-id').innerText = '#' + data.order_id;
-                        document.getElementById('modal-order-date').innerText = data.date;
-                        document.getElementById('modal-customer').innerText = data.customer_name;
-                        document.getElementById('modal-total-amt').innerText = '₱' + data.total_amount;
+                            // Map string variables cleanly onto DOM receipt elements variables
+                            document.getElementById('modal-order-id').innerText = '#' + data.order_id;
+                            document.getElementById('modal-order-date').innerText = data.date;
+                            document.getElementById('modal-customer').innerText = data.customer_name;
+                            document.getElementById('modal-total-amt').innerText = '₱' + data.total_amount;
 
-                        // Render status badges with proper coloring layout matching contextual parameters
-                        const statusEl = document.getElementById('modal-status');
-                        statusEl.innerText = data.status.toUpperCase();
+                            // Render status badges with proper coloring layout matching contextual parameters
+                            const statusEl = document.getElementById('modal-status');
+                            statusEl.innerText = data.status.toUpperCase();
 
-                        // 🌟 Inside your fetch().then(data => { ... }) loop block, replace 'const statusEl...' with this:
-                        statusEl.className =
-                            'text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wide text-center';
+                            // 🌟 Inside your fetch().then(data => { ... }) loop block, replace 'const statusEl...' with this:
+                            statusEl.className =
+                                'text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wide text-center';
 
-                        const normalizedStatus = data.status.toLowerCase();
-                        if (normalizedStatus === 'completed' || normalizedStatus === 'paid') {
-                            statusEl.classList.add('bg-emerald-100', 'text-emerald-800');
-                        } else if (normalizedStatus === 'pending') {
-                            statusEl.classList.add('bg-amber-100', 'text-amber-800');
-                        } else if (normalizedStatus === 'refunded') {
-                            statusEl.classList.add('bg-gray-200', 'text-gray-600');
-                        } else {
-                            statusEl.classList.add('bg-sky-100', 'text-sky-800');
-                        }
+                            const normalizedStatus = data.status.toLowerCase();
+                            if (normalizedStatus === 'completed' || normalizedStatus === 'paid') {
+                                statusEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                            } else if (normalizedStatus === 'pending') {
+                                statusEl.classList.add('bg-amber-100', 'text-amber-800');
+                            } else if (normalizedStatus === 'refunded') {
+                                statusEl.classList.add('bg-gray-200', 'text-gray-600');
+                            } else {
+                                statusEl.classList.add('bg-sky-100', 'text-sky-800');
+                            }
 
-                        itemsRows.innerHTML = ''; // wipe loading structures clean
+                            itemsRows.innerHTML = ''; // wipe loading structures clean
 
-                        // Loop through the purchases list
-                        data.items.forEach(item => {
-                            const tr = document.createElement('tr');
-                            tr.className = "hover:bg-slate-50/40 transition font-medium text-gray-700";
-                            tr.innerHTML = `
+                            // Loop through the purchases list
+                            data.items.forEach(item => {
+                                const tr = document.createElement('tr');
+                                tr.className = "hover:bg-slate-50/40 transition font-medium text-gray-700";
+                                tr.innerHTML = `
                                 <td class="py-2.5 px-4 font-bold text-gray-900">${item.name}</td>
                                 <td class="py-2.5 px-4 text-center font-bold text-gray-400">${item.qty}</td>
                                 <td class="py-2.5 px-4 text-right font-black text-gray-900">₱${parseFloat(item.price * item.qty).toFixed(2)}</td>
                             `;
-                            itemsRows.appendChild(tr);
-                        });
+                                itemsRows.appendChild(tr);
+                            });
 
-                        // Transition active state visibility layer classes on screen
-                        modal.classList.remove('hidden');
-                        modal.classList.add('flex');
-                    })
-                    .catch(() => alert('Could not parse transaction telemetry logs details.'));
+                            // Transition active state visibility layer classes on screen
+                            modal.classList.remove('hidden');
+                            modal.classList.add('flex');
+                        })
+                        .catch(() => alert('Could not parse transaction telemetry logs details.'));
+                });
             });
-        });
 
-        // Close buttons behaviors triggers handlers
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            });
-        }
-
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+            // Close buttons behaviors triggers handlers
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                });
             }
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            });
         });
-    });
-</script>
+    </script>

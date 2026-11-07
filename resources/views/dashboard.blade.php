@@ -7,7 +7,8 @@
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Sales</span>
             <h3 class="text-2xl font-black text-slate-800 mt-2">₱{{ number_format($totalSales ?? 0, 2) }}</h3>
             <p class="text-[11px] {{ $salesDiffColor ?? 'text-slate-400' }} font-bold mt-1">
-                {{ $salesDiffText ?? 'No revenue changes' }}</p>
+                {{ $salesDiffText ?? 'No revenue changes' }}
+            </p>
         </div>
 
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
@@ -57,11 +58,14 @@
             <p class="text-xs text-slate-400 font-medium mb-4">Store product inventory reference list</p>
 
             <div class="space-y-3">
-                @forelse($topProducts ?? [] as $prod)
-                    <div
-                        class="flex justify-between items-center p-2.5 hover:bg-slate-50 rounded-xl transition border border-transparent hover:border-slate-100">
-                        <span class="text-xs font-bold text-slate-700">{{ $prod->name }}</span>
-                        <span class="text-xs font-black text-slate-900">₱{{ number_format($prod->price, 2) }}</span>
+                {{-- 🟢 Standardized to fix editor property validation warnings --}}
+                @forelse($topProducts as $prod)
+                    <div>
+                        <div
+                            class="flex justify-between items-center p-2.5 hover:bg-slate-50 rounded-xl transition border border-transparent hover:border-slate-100">
+                            <span class="text-xs font-bold text-slate-700">{{ $prod->name }}</span>
+                            <span class="text-xs font-black text-slate-900">₱{{ number_format($prod->price, 2) }}</span>
+                        </div>
                     </div>
                 @empty
                     <p class="text-xs font-bold text-slate-400 text-center py-12">No products found.</p>
@@ -85,19 +89,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($orders ?? [] as $order)
+                    {{-- 🟢 Standardized loop header removes the ?? [] fallback to clear all editor property validation
+                    errors --}}
+                    @forelse($orders as $order)
                         <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
-                            <td class="py-4 px-4 font-bold text-slate-900">#{{ $order->id }}</td>
+                            <td class="py-4 px-4 font-bold text-slate-900">#{{ $order->order_number ?? $order->id }}</td>
                             <td class="py-4 px-4 text-slate-500 font-medium">{{ $order->customer_name }}</td>
                             <td class="py-4 px-4 font-bold text-slate-900">₱{{ number_format($order->total_amount, 2) }}</td>
                             <td class="py-4 px-4">
                                 <span
-                                    class="px-2.5 py-1 rounded-full font-bold uppercase text-[9px] tracking-wide {{ $order->status === 'Completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }}">
+                                    class="px-2.5 py-1 rounded-full font-bold uppercase text-[9px] tracking-wide {{ strtolower($order->status) === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
                                     {{ $order->status }}
                                 </span>
                             </td>
                             <td class="py-4 px-4 text-slate-400 font-medium">
-                                {{ \Carbon\Carbon::parse($order->created_at)->format('M d, Y') }}</td>
+                                {{ $order->created_at ? \Carbon\Carbon::parse($order->created_at)->format('M d, Y') : 'N/A' }}
+                            </td>
                         </tr>
                     @empty
                         <tr>

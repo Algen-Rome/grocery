@@ -6,5 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    //
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'customer_name',
+        'customer_phone',
+        'items',
+        'total_amount',
+        'delivery_address',
+        'order_number',
+        'status',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'items' => 'array', // 🌟 CRITICAL: Automatically encodes/decodes your hotdog items payload array to JSON strings in the database!
+    ];
 }

@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -80,15 +81,10 @@ Route::get('/dashboard', function () {
     }
 
     // 7. Fetch Top Products for Leaderboard Iterations
-    $topProducts = DB::table('products')
-        ->limit(5)
-        ->get();
+    $topProducts = \App\Models\Product::limit(5)->get();
 
-    // 8. Fetch Recent Orders for Activity Logs
-    $orders = DB::table('orders')
-        ->latest('created_at')
-        ->limit(5)
-        ->get();
+    // 8. FIX: Fetch Recent Orders using the Eloquent Model to clear the IDE type warning
+    $orders = \App\Models\Order::latest('created_at')->limit(5)->get();
 
     // 9. NEW: Fetch Real Chart Data for the Last 7 Days
     $chartData = [];
@@ -225,18 +221,20 @@ Route::post('/products', function (\Illuminate\Http\Request $request) {
     return redirect()->route('products.index')->with('success', 'New product successfully added to your inventory tracks!');
 })->name('products.storeSecure');
 
-Route::get('/sales-ledger', function () {
-    $totalRevenue = Order::where('status', 'Completed')->sum('total_amount');
-    $totalOrdersCount = Order::count();
-    $avgOrderValue = $totalOrdersCount > 0 ? ($totalRevenue / $totalOrdersCount) : 0;
-    $allSales = Order::latest()->get();
+// 📁 Open routes/web.php and replace your /sales-ledger GET route with this:
 
-    return view('sales', compact(
-        'totalRevenue',
-        'totalOrdersCount',
-        'avgOrderValue',
-        'allSales'
-    ));
+Route::get('/sales-ledger', function () {
+    // 1. Fetch all orders
+    $orders = \App\Models\Order::orderBy('created_at', 'desc')->get();
+
+    // 2. Calculate data metrics using names that your Blade cards expect
+    $totalRevenue = \App\Models\Order::where('status', 'Completed')->sum('total_amount');
+    $totalOrdersCount = $orders->count(); // 🌟 MATCHES LINE 49
+    $avgOrderValue = $totalOrdersCount > 0 ? ($orders->sum('total_amount') / $totalOrdersCount) : 0;
+
+    // 3. Pass everything down to the view safely
+    return view('sales', compact('orders', 'totalRevenue', 'totalOrdersCount', 'avgOrderValue'));
+
 })->name('sales.index');
 Route::get('/sales/create', function () {
     // Fetches items so you can select grocery items out of a dropdown inside your POS workspace view
@@ -245,22 +243,41 @@ Route::get('/sales/create', function () {
 })->name('sales.create');
 
 // 2. The structural post action route that receives inputs and stores them securely inside your order logs
-Route::post('/sales/store', function (\Illuminate\Http\Request $request) {
-    // Validates inputs, deducts stock targets, and falls back gracefully to the index view
-    $validated = $request->validate([
-        'customer_name' => 'required|string|max:255',
-        'total_amount' => 'required|numeric|min:0',
+Route::post('/sales/store', function (Illuminate\Http\Request $request) {
+    $request->validate([
+        'customer_name' => 'required|string',
+        'total_amount' => 'required|numeric',
     ]);
 
-    DB::table('orders')->insert([
-        'customer_name' => $validated['customer_name'],
-        'total_amount' => $validated['total_amount'],
-        'status' => 'Completed',
-        'created_at' => now(),
-        'updated_at' => now(),
+    $orderNumber = 'ORD-' . strtoupper(substr(uniqid(), 7));
+
+    // 🌟 FIX: Structure item rows correctly so your view loops find array dimensions!
+    $itemsPayload = $request->items;
+
+    // If the form items parameter is missing or arrived unformatted, 
+    // structure an item container mapping based on selection counts
+    if (empty($itemsPayload)) {
+        $itemsPayload = [
+            [
+                'id' => $request->product_id ?? 0,
+                'name' => $request->product_name ?? 'Grocery Item',
+                'quantity' => $request->quantity ?? 1,
+                'price' => $request->total_amount
+            ]
+        ];
+    }
+
+    Order::create([
+        'customer_name' => $request->customer_name,
+        'customer_phone' => $request->customer_phone ?? 'N/A',
+        'delivery_address' => $request->delivery_address ?? 'Store Counter Pickup',
+        'total_amount' => $request->total_amount,
+        'status' => $request->status ?? 'Completed',
+        'order_number' => $orderNumber,
+        'items' => $itemsPayload, // 🌟 Saves as a cleanly mapped item array element block
     ]);
 
-    return redirect()->route('sales.index')->with('success', 'New sale logged cleanly!');
+    return redirect('/sales-ledger')->with('success', 'Sale logged successfully!');
 })->name('sales.store');
 // Fetches detailed item attributes for an order transaction log to display in a modal overlay
 Route::get('/sales/{id}/json', function ($id) {
@@ -293,6 +310,19 @@ Route::delete('/products/{id}', function ($id) {
 
     return redirect()->route('products.index')->with('success', 'Product removed successfully from inventory!');
 })->name('products.destroy');
+
+Route::get('/orders/view/{id}', function ($id) {
+    $order = \App\Models\Order::findOrFail($id);
+    return view('sales-view', compact('order'));
+})->name('sales.show');
+
+
+Route::delete('/orders/delete/{id}', function ($id) {
+    $order = \App\Models\Order::findOrFail($id);
+    $order->delete();
+
+    return redirect('/sales-ledger')->with('success', 'Order deleted successfully!');
+})->name('sales.destroy');
 
 
 // 1. Render the form screen to create a brand new product
@@ -426,6 +456,12 @@ Route::delete('/sales/{id}/delete-record', function ($id) {
     DB::table('orders')->where('id', $id)->delete();
     return redirect()->route('sales.index')->with('success', 'Transaction ledger record successfully deleted!');
 })->name('sales.destroy');
+
+// 📥 Endpoint to create a new order (Saves as Pending)
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+// 📉 Endpoint to change order status (Triggers your live inventory deduction on "Completed")
+Route::put('/orders/update-status/{id}', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
 Route::get('/inventory-report', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
 // 🌟 ADD THIS PRINT EXPORT ROUTE TRIGGER:
