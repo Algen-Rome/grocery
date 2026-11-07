@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -425,6 +426,8 @@ Route::delete('/sales/{id}/delete-record', function ($id) {
     DB::table('orders')->where('id', $id)->delete();
     return redirect()->route('sales.index')->with('success', 'Transaction ledger record successfully deleted!');
 })->name('sales.destroy');
+
+Route::get('/inventory-report', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
 
 Route::post('/logout', function () {
     return redirect('/');
