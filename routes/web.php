@@ -428,6 +428,11 @@ Route::delete('/sales/{id}/delete-record', function ($id) {
 })->name('sales.destroy');
 
 Route::get('/inventory-report', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
+// 🌟 ADD THIS PRINT EXPORT ROUTE TRIGGER:
+Route::get('/inventory-report/export-pdf', [App\Http\Controllers\ReportController::class, 'exportPdf'])->name('reports.inventory.pdf');
+
+// 🌟 ROUTE FOR DYNAMIC RECORD LOG DOWNLOADING:
+Route::get('/report-log/download/{filename}', [ReportController::class, 'downloadLog'])->name('reports.log.download');
 
 Route::post('/logout', function () {
     return redirect('/');

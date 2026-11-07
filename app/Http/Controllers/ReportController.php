@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Barryvdh\DomPDF\Facade\Pdf; // 🌟 MANDATORY FOR GENERATING PRINTS
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
@@ -149,4 +150,48 @@ class ReportController extends Controller
 
         return $pdf->download('inventory-report-' . now()->format('Y-m-d') . '.pdf');
     }
+        /**
+     * Compile a live database CSV spreadsheet file block and stream it dynamically.
+     */
+    public function downloadLog($filename)
+    {
+        // Clean up the parameter input strings into clean identifiers
+        $slug = Str::slug($filename);
+        
+        // Headers forcing the web browser window to treat the server stream path as an Excel CSV file download
+        $headers = [
+            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=" . $slug . "-" . now()->format('Y-m-d') . ".csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        // Fetch live database rows to compile into the spreadsheet matrix rows data rows
+        $products = DB::table('products')->orderBy('name', 'asc')->get();
+
+        // Open an automated memory execution data pipe channel to write structural row entries
+        $callback = function() use($products) {
+            $file = fopen('php://output', 'w');
+            
+            // Insert standard spreadsheet data column label ribbon rows
+            fputcsv($file, ['PRODUCT ID', 'PRODUCT NAME', 'STOCK UNIT COUNT', 'PRICE', 'REORDER LAYER VALUE']);
+
+            foreach ($products as $item) {
+                fputcsv($file, [
+                    $item->id,
+                    $item->name,
+                    $item->stock_count,
+                    $item->price,
+                    $item->reorder_level
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        // Stream the compiled calculation matrix block directly to the computer disk channel ports
+        return response()->stream($callback, 200, $headers);
+    }
+
 }
