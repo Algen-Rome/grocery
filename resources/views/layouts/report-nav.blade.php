@@ -4,30 +4,35 @@
 
 <!-- ==================== CENTRALIZED REPORT NAVIGATION LINK BAR ==================== -->
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 w-full">
-    <!-- Sub-Report Dynamic Tab Switcher Grid Matrix Layout -->
-    <div class="flex flex-wrap gap-2.5">
+    <!-- ==================== DYNAMIC CENTRALIZED REPORT NAVIGATION PILLS RIBBON BAR ==================== -->
+    <div class="flex items-center space-x-3 w-full">
 
-        <!-- 🌟 FIXED: Point this cleanly to your reports handler route index instead of sales index! -->
+        <!-- Sales Report (Muted / Unselected Style Example) -->
         <a href="{{ route('reports.index') }}"
             class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.index' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
             Sales Report
         </a>
 
+        <!-- Inventory Report (Muted / Unselected Base Style) -->
         <a href="{{ route('reports.inventory') }}"
             class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.inventory' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
             Inventory Report
         </a>
 
-        <a href="#"
-            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition bg-slate-300 text-slate-700 hover:bg-slate-400">
+        <!-- Customer Report (Active / Selected High-Contrast Dark Green Style) -->
+        <a href="{{ route('reports.customer') }}"
+            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.customer' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
             Customer Report
         </a>
 
-        <a href="#"
-            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition bg-slate-300 text-slate-700 hover:bg-slate-400">
+        <!-- Financial Report (UPDATED: Restructured wrapper classes to exactly match unselected pills) -->
+        <a href="{{ route('reports.financial') }}"
+            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.financial' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
             Financial Report
         </a>
+
     </div>
+
 
     <!-- Action Date Ribbon Layout Summary Section Container -->
     <!-- 📊 Find this block in layouts/report-nav.blade.php and change your button to an active anchor link route structure: -->

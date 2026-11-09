@@ -7,18 +7,19 @@
 
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://bunny.net">
+    <link href="https://bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+    <!-- Routing Scripts -->
     @routes
+
+    <!-- Asset Compiler Engine Bundle -->
     @if(isset($page))
         @viteReactRefresh
-        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
         @inertiaHead
     @endif
-
-
 </head>
 
 <body class="font-sans antialiased">

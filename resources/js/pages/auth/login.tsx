@@ -1,14 +1,5 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
-
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { Head, useForm, Link } from '@inertiajs/react';
+import { FormEventHandler, ChangeEvent } from 'react';
 
 interface LoginForm {
     email: string;
@@ -19,7 +10,7 @@ interface LoginForm {
 
 interface LoginProps {
     status?: string;
-    canResetPassword: boolean;
+    canResetPassword?: boolean;
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
@@ -37,84 +28,115 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <div className="min-h-screen w-full bg-emerald-800 flex items-center justify-center sm:p-0 font-sans">
+        <div className="min-h-screen w-full bg-[#1b5335] flex items-center justify-center p-4 font-sans text-gray-900">
             <Head title="Log in" />
 
-            <div className="bg-white min-w-150 max-w-md min-h-screen shadow-2xl p-8 sm:p-12 rounded-[2rem] flex flex-col text-gray-900 rounded-none justify-center">
+            {/* Main Form Box Container */}
+            <div className="bg-white w-full max-w-[480px] rounded-2xl shadow-xl overflow-hidden flex flex-col items-center px-10 py-12 min-h-[640px]">
 
-                <div className="bg-emerald-800 text-white px-6 py-10 rounded-full text-center font-black tracking-widest text-2xl mb-8 mx-auto w-fit uppercase shadow-sm font-extrabold">
-                    GROCERY STORE APP
-                </div>
-                <div className="text-center mb-6">
-                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">Welcome</h2>
-                    <p className="text-sm text-gray-400 font-semibold mt-1">Please login to your admin account</p>
+                {/* App Logo Pill */}
+                <div className="bg-[#1b5335] text-white font-black text-xs tracking-wider uppercase px-8 py-3 rounded-full mb-12 shadow-sm">
+                    Grocery Store App
                 </div>
 
-                <form className="flex flex-col gap-5" onSubmit={submit}>
-                    <div className="grid gap-5 px-20">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email" className="text-gray-700 font-extrabold text-lg tracking-wider text-left block">Email address</Label>
-                            <Input
+                {/* Welcome Header Titles */}
+                <div className="w-full text-left mb-6">
+                    <h1 className="text-xl font-bold text-gray-900">Welcome</h1>
+                    <p className="text-xs text-gray-400 mt-1">Please log in to your account</p>
+                </div>
+
+                {status && (
+                    <div className="w-full mb-4 text-sm font-medium text-emerald-600">
+                        {status}
+                    </div>
+                )}
+
+                <form onSubmit={submit} className="w-full flex-1 flex flex-col justify-between">
+                    <div className="space-y-4">
+                        {/* Email Address Field Input */}
+                        <div>
+                            <label htmlFor="email" className="block text-xs font-bold text-gray-800 mb-1">
+                                Email Address
+                            </label>
+                            <input
                                 id="email"
                                 type="email"
-                                required
-                                autoFocus
-                                tabIndex={1}
-                                autoComplete="email"
+                                name="email"
                                 value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                placeholder="email@example.com"
-                                className="w-full border border-gray-200 rounded-sm px-4 py-3 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition font-medium text-sm h-auto bg-gray-50 text-gray-900 placeholder-gray-400"
+                                className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1b5335]"
+                                autoComplete="username"
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setData('email', e.target.value)}
+                                required
                             />
-                            <InputError message={errors.email} />
+                            {errors.email && (
+                                <p className="mt-2 text-xs text-red-500 font-semibold">{errors.email}</p>
+                            )}
                         </div>
 
-                        <div className="grid gap-2">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="password" className="text-gray-700 font-extrabold text-lg tracking-wider">Password</Label>
-                            </div>
-                            <Input
+                        {/* Password Field Input */}
+                        <div>
+                            <label htmlFor="password" className="block text-xs font-bold text-gray-800 mb-1">
+                                Password
+                            </label>
+                            <input
                                 id="password"
                                 type="password"
-                                required
-                                tabIndex={2}
-                                autoComplete="current-password"
+                                name="password"
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                placeholder="Password"
-                                className="w-full border border-gray-200 rounded-sm px-4 py-3 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition font-medium text-sm h-auto bg-gray-50 text-gray-900 placeholder-gray-400"
+                                className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1b5335]"
+                                autoComplete="current-password"
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setData('password', e.target.value)}
+                                required
                             />
-                            <InputError message={errors.password} />
+                            {errors.password && (
+                                <p className="mt-2 text-xs text-red-500 font-semibold">{errors.password}</p>
+                            )}
                         </div>
 
-                        <div className="flex items-center space-x-3 space-y-0">
-                            <Checkbox id="remember" name="remember" tabIndex={3} className="border-gray-300 data-[state=checked]:bg-emerald-800 data-[state=checked]:border-emerald-800 rounded-full" />
-                            <div className="flex-1 flex items-center justify-between">
-                                <Label htmlFor="remember" className="text-sm font-medium text-gray-600 cursor-pointer select-none">Remember me</Label>
-                                {canResetPassword && (
-                                    <TextLink href={route('password.request')} className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 transition" tabIndex={5}>
-                                        Forgot password?
-                                    </TextLink>
-                                )}
-                            </div>
-                        </div>
+                        {/* Remember Me and Forgot Password Row */}
+                        <div className="flex items-center justify-between text-[11px] font-semibold text-gray-400 pt-1">
+                            <label className="flex items-center space-x-1.5 cursor-pointer">
+                                <input
+                                    id="remember"
+                                    type="checkbox"
+                                    name="remember"
+                                    checked={data.remember}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setData('remember', e.target.checked)}
+                                    className="accent-[#1b5335] rounded"
+                                />
+                                <span className="text-gray-400">Remember me</span>
+                            </label>
 
-                        <Button type="submit" className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-black py-6  shadow-lg transition-all tracking-wide block text-center flex flex-col justify-center mt-2 border-none text-sm uppercase " tabIndex={4} disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin mr-2 inline" />}
-                            Log in
-                        </Button>
+                            {canResetPassword && (
+                                <Link
+                                    href={route('password.request')}
+                                    className="text-gray-900 font-bold hover:underline"
+                                >
+                                    Forgot Password?
+                                </Link>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="text-gray-400 text-center text-sm mt-4 font-medium">
-                        Don't have an account?{' '}
-                        <TextLink href={route('register')} className="text-emerald-700 font-bold hover:underline ml-1 transition" tabIndex={5}>
-                            Sign up
-                        </TextLink>
+                    {/* Lower Submit Action Hooks Wrapper Group */}
+                    <div className="mt-8 space-y-4 text-center">
+                        <button
+                            type="submit"
+                            className="w-full bg-[#1b5335] text-white font-bold text-sm py-3.5 rounded-xl hover:bg-[#154129] flex justify-center items-center transition shadow-md disabled:opacity-50"
+                            disabled={processing}
+                        >
+                            Log in
+                        </button>
+
+                        <p className="text-xs text-gray-400 font-semibold">
+                            Don't have an account?{' '}
+                            <Link href={route('register')} className="text-gray-900 font-bold hover:underline">
+                                Sign Up
+                            </Link>
+                        </p>
                     </div>
                 </form>
             </div>
-
-            {status && <div className="mt-4 text-center text-sm font-semibold text-white bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">{status}</div>}
         </div>
     );
 }

@@ -10,6 +10,7 @@
         <!-- Backend Form Submission Point -->
         <form action="{{ route('sales.store') }}" method="POST" id="sales-form">
             @csrf
+            <!-- Secure Total Value Hidden Mirror Input -->
             <input type="hidden" name="total_amount" id="form-total-amount" value="0.00" />
 
             <!-- Main Workspace Two-Column Split Layout Grid -->
@@ -75,8 +76,7 @@
                                                 <div>
                                                     <p class="text-xs font-bold text-slate-900 mb-0.5">{{ $product->name }}</p>
                                                     <p class="text-[10px] text-slate-400 font-semibold">Available Inventory:
-                                                        {{ $product->stock_count }} units
-                                                    </p>
+                                                        {{ $product->stock_count }} units</p>
                                                 </div>
                                                 <span
                                                     class="text-xs font-black text-emerald-600">₱{{ number_format($product->price, 2) }}</span>
@@ -97,7 +97,8 @@
                 </div>
 
                 <!-- Right Hand Column Container: Order Summary Panel -->
-                <div class="p-6 rounded-2xl flex flex-col justify-between shadow-sm border border-transparent bg-slate-50">
+                <div
+                    class="p-6 rounded-2xl flex flex-col justify-between shadow-sm border border-transparent bg-slate-50 min-h-[380px]">
                     <div>
                         <h2 class="text-sm font-black text-gray-900 uppercase tracking-wider mb-4">Order Summary</h2>
 
@@ -105,9 +106,10 @@
                         <div class="flex justify-between items-center text-xs font-semibold mb-4">
                             <span class="text-gray-400">Customer</span>
                             <input type="text" name="customer_name" value="Maria Santos" required
-                                class="bg-transparent border-b border-transparent hover:border-gray-400 focus:border-emerald-600 focus:outline-none text-right font-bold text-gray-800 py-0.5 transition w-32" />
+                                class="bg-transparent border-b border-gray-200 hover:border-gray-400 focus:border-emerald-600 focus:outline-none text-right font-bold text-gray-800 py-0.5 transition w-40" />
                         </div>
 
+                        <!-- Live Metrics Summary Readouts -->
                         <div class="space-y-3 border-b border-gray-200 pb-3.5 mb-4 text-sm font-semibold text-slate-700">
                             <div class="flex justify-between">
                                 <span class="text-gray-400">Items</span>
@@ -122,45 +124,33 @@
                         <div
                             class="flex justify-between text-sm font-black text-gray-900 border-b border-gray-200 pb-3.5 mb-5">
                             <span>Total</span>
-                            <span id="summary-total" class="text-base font-black text-emerald-600">₱0.00</span>
+                            <span id="summary-total" class="text-base font-black text-gray-900">₱0.00</span>
                         </div>
 
-                        <!-- Payment Input Fields Sections -->
-                        <div class="space-y-4">
-                            <div>
-                                <label
-                                    class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Payment
-                                    Method</label>
-                                <select name="payment_method"
-                                    class="w-full rounded-xl bg-white border border-slate-200 p-3 text-sm font-bold text-gray-700 focus:outline-none shadow-sm">
-                                    <option value="Cash">Cash</option>
-                                    <option value="GCash">GCash</option>
-                                    <option value="Maya">Maya</option>
-                                    <option value="Credit Card">Credit Card</option>
-                                </select>
+                        <!-- Cash Calculator Controls Segment -->
+                        <div class="space-y-3 bg-white p-4 rounded-xl border border-gray-100 mb-6 shadow-inner">
+                            <div class="flex justify-between items-center text-xs font-bold text-gray-600">
+                                <span>Amount Received</span>
+                                <input type="number" step="0.01" id="amount-received" oninput="calculateLiveChange()"
+                                    placeholder="₱0.00"
+                                    class="w-24 bg-gray-50 border border-gray-200 rounded-md p-1.5 text-right font-black text-gray-900 focus:outline-none focus:border-emerald-500">
                             </div>
-
-                            <div>
-                                <label
-                                    class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Amount
-                                    Received</label>
-                                <input type="number" value="500" min="0" step="1" id="amount-received"
-                                    oninput="calculateLiveChange()"
-                                    class="w-full rounded-xl bg-white border border-slate-200 p-3 text-sm font-black text-gray-800 focus:outline-none shadow-sm" />
-                            </div>
-
-                            <div class="flex justify-between items-center pt-2 text-sm font-semibold text-gray-700">
-                                <span class="text-gray-400">Change</span>
-                                <span id="change-display" class="text-base font-black text-gray-900">₱0.00</span>
+                            <div class="flex justify-between items-center text-xs font-bold text-gray-600">
+                                <span>Change Due</span>
+                                <span id="change-display" class="font-black text-emerald-600">₱0.00</span>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm py-3.5 rounded-xl shadow-sm mt-8 block border-0 cursor-pointer text-center transition">
-                        Complete Sale
-                    </button>
+                    <!-- 🌟 SUBMIT TRANSACTION ACTION BUTTON CONTAINER -->
+                    <div>
+                        <button type="submit"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider py-4 rounded-xl transition-all shadow-md transform active:scale-[0.98] cursor-pointer text-center">
+                            Complete Checkout & Deduct Stock
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </form>
     </div>
@@ -239,9 +229,13 @@
 
             const existingRow = document.getElementById('cart-item-' + itemId);
             if (existingRow) {
-                const qtyInput = existingRow.querySelector('input[type="number"]');
+                const qtyInput = existingRow.querySelector('.cart-qty-field');
                 if (qtyInput) {
                     qtyInput.value = parseInt(qtyInput.value) + 1;
+                    // 🌟 Sync the matching hidden mirror field
+                    const hiddenQty = existingRow.querySelector('.hidden-qty-field');
+                    if (hiddenQty) hiddenQty.value = qtyInput.value;
+
                     updateRowSubtotal(itemId, itemPrice);
                 }
                 cleanupPOSSearchState();
@@ -251,10 +245,19 @@
             const row = document.createElement('tr');
             row.id = 'cart-item-' + itemId;
             row.className = 'border-b border-slate-100 align-middle';
+
+            // 🌟 FIX: Injected hidden form input fields using array brackets [] 
+            // This allows Laravel to read $request->product_id and $request->quantity as arrays!
             row.innerHTML = `
-                    <td class="py-4 px-4 font-bold text-slate-900">${itemName}</td>
+                    <td class="py-4 px-4 font-bold text-slate-900">
+                        ${itemName}
+                        <input type="hidden" name="product_id[]" value="${itemId}">
+                    </td>
                     <td class="py-4 px-4">
-                        <input type="number" value="1" min="1" oninput="updateRowSubtotal(${itemId}, ${itemPrice})" class="w-16 border border-slate-200 rounded-md p-1 text-center text-xs font-bold text-slate-800 focus:outline-none">
+                        <input type="number" value="1" min="1" 
+                               oninput="syncHiddenQty(${itemId}, this.value); updateRowSubtotal(${itemId}, ${itemPrice})" 
+                               class="w-16 border border-slate-200 rounded-md p-1 text-center text-xs font-bold text-slate-800 focus:outline-none cart-qty-field">
+                        <input type="hidden" name="quantity[]" value="1" id="hidden-qty-${itemId}" class="hidden-qty-field">
                     </td>
                     <td class="py-4 px-4 text-slate-500 font-medium">₱${itemPrice.toFixed(2)}</td>
                     <td class="py-4 px-4 font-bold text-slate-900 cart-row-subtotal-value" id="subtotal-${itemId}">₱${itemPrice.toFixed(2)}</td>
@@ -266,6 +269,14 @@
             tbody.appendChild(row);
             cleanupPOSSearchState();
             calculateCartTotals();
+        }
+
+        // 🌟 HELPER FUNCTION: Keeps your hidden array quantities synchronized when inputs change
+        function syncHiddenQty(id, val) {
+            const hiddenInput = document.getElementById('hidden-qty-' + id);
+            if (hiddenInput) {
+                hiddenInput.value = parseInt(val) || 1;
+            }
         }
 
         function cleanupPOSSearchState() {

@@ -244,40 +244,67 @@ Route::get('/sales/create', function () {
 
 // 2. The structural post action route that receives inputs and stores them securely inside your order logs
 Route::post('/sales/store', function (Illuminate\Http\Request $request) {
+    // 1. Validate incoming base inputs
     $request->validate([
         'customer_name' => 'required|string',
         'total_amount' => 'required|numeric',
     ]);
 
-    $orderNumber = 'ORD-' . strtoupper(substr(uniqid(), 7));
+    Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+        $orderNumber = 'ORD-' . strtoupper(substr(uniqid(), 7));
+        $itemsPayload = [];
 
-    // 🌟 FIX: Structure item rows correctly so your view loops find array dimensions!
-    $itemsPayload = $request->items;
+        // 2. 🌟 MULTI-ITEM ARRAY PARSING PIPELINE
+        // Read form arrays (Ensure your HTML form inputs use names like product_id[], quantity[])
+        if ($request->has('product_id') && is_array($request->product_id)) {
+            foreach ($request->product_id as $index => $prodId) {
+                $qty = intval($request->quantity[$index] ?? 1);
 
-    // If the form items parameter is missing or arrived unformatted, 
-    // structure an item container mapping based on selection counts
-    if (empty($itemsPayload)) {
-        $itemsPayload = [
-            [
-                'id' => $request->product_id ?? 0,
-                'name' => $request->product_name ?? 'Grocery Item',
-                'quantity' => $request->quantity ?? 1,
-                'price' => $request->total_amount
-            ]
-        ];
-    }
+                if ($prodId && $qty > 0) {
+                    $product = \App\Models\Product::find($prodId);
 
-    Order::create([
-        'customer_name' => $request->customer_name,
-        'customer_phone' => $request->customer_phone ?? 'N/A',
-        'delivery_address' => $request->delivery_address ?? 'Store Counter Pickup',
-        'total_amount' => $request->total_amount,
-        'status' => $request->status ?? 'Completed',
-        'order_number' => $orderNumber,
-        'items' => $itemsPayload, // 🌟 Saves as a cleanly mapped item array element block
-    ]);
+                    if ($product) {
+                        $itemsPayload[] = [
+                            'id' => $product->id,
+                            'name' => $product->name,
+                            'quantity' => $qty,
+                            'price' => floatval($product->price) // or custom price fields if present
+                        ];
 
-    return redirect('/sales-ledger')->with('success', 'Sale logged successfully!');
+                        // 3. Deduct stock levels dynamically inside loop cycle execution
+                        $product->decrement('stock_count', $qty);
+                    }
+                }
+            }
+        }
+        // Fallback backward compatibility tracker if raw single item parameters are sent
+        elseif ($request->filled('product_id')) {
+            $product = \App\Models\Product::find($request->product_id);
+            if ($product) {
+                $qty = intval($request->quantity ?? 1);
+                $itemsPayload[] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'quantity' => $qty,
+                    'price' => floatval($request->total_amount)
+                ];
+                $product->decrement('stock_count', $qty);
+            }
+        }
+
+        // 4. Create the final structural Order row document layer
+        \App\Models\Order::create([
+            'customer_name' => $request->customer_name,
+            'customer_phone' => $request->customer_phone ?? 'N/A',
+            'delivery_address' => $request->delivery_address ?? 'Store Counter Pickup',
+            'total_amount' => $request->total_amount,
+            'status' => $request->status ?? 'Completed',
+            'order_number' => $orderNumber,
+            'items' => $itemsPayload,
+        ]);
+    });
+
+    return redirect('/sales-ledger')->with('success', 'Multi-item sale created and stock decremented successfully!');
 })->name('sales.store');
 // Fetches detailed item attributes for an order transaction log to display in a modal overlay
 Route::get('/sales/{id}/json', function ($id) {
@@ -470,6 +497,109 @@ Route::get('/inventory-report/export-pdf', [App\Http\Controllers\ReportControlle
 // 🌟 ROUTE FOR DYNAMIC RECORD LOG DOWNLOADING:
 Route::get('/report-log/download/{filename}', [ReportController::class, 'downloadLog'])->name('reports.log.download');
 
-Route::post('/logout', function () {
-    return redirect('/');
-})->name('logout');
+Route::get('/reports/customer', function (Request $request) {
+    // 1. Calculate live customer summary telemetry statistics metrics
+    $totalCustomers = DB::table('orders')->distinct()->count('customer_name');
+
+    // Count new distinct client profiles logged over the current calendar month
+    $newThisMonth = DB::table('orders')
+        ->whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->distinct()
+        ->count('customer_name');
+
+    // Active customers today tracking logs count
+    $activeToday = DB::table('orders')
+        ->whereDate('created_at', Carbon::today())
+        ->distinct()
+        ->count('customer_name');
+
+    // 2. Generate monthly grouping counts for the visual growth chart layout array matrices
+    $monthlyGrowthRaw = DB::table('orders')
+        ->select(DB::raw("DATE_FORMAT(created_at, '%b') as month_name"), DB::raw('COUNT(DISTINCT customer_name) as base_count'))
+        ->groupBy('month_name')
+        ->orderByRaw("MIN(created_at)")
+        ->get();
+
+    $maxCount = $monthlyGrowthRaw->max('base_count') ?: 1;
+    $chartData = [];
+    foreach ($monthlyGrowthRaw as $row) {
+        $chartData[] = [
+            'month' => $row->month_name,
+            'count' => $row->base_count,
+            'height' => max(($row->base_count / $maxCount) * 100, 15) // dynamic relative tall bars percent styling
+        ];
+    }
+
+    // 3. Static fallback placeholders mapping your generated historical reports logs download loop matrix
+    $reportLogs = [
+        ['title' => 'Customer Growth - August', 'type' => 'Customer', 'date' => 'Sep 2, 2026'],
+        ['title' => 'Loyalty Members Summary', 'type' => 'Customer', 'date' => 'Aug 25, 2026'],
+    ];
+
+    return view('reports-customer', compact(
+        'totalCustomers',
+        'newThisMonth',
+        'activeToday',
+        'chartData',
+        'reportLogs'
+    ));
+})->name('reports.customer');
+
+Route::get('/reports/financial', function () {
+    // 1. Compute Live Financial Telemetry from your orders database table
+    $totalRevenue = \App\Models\Order::where('status', 'Completed')->sum('total_amount') ?? 0;
+
+    // Simulate structural store expenses (wholesale cost of goods sold + operations ~ 72% of total value)
+    $totalExpenses = $totalRevenue > 0 ? ($totalRevenue * 0.73) : 0;
+    $netProfit = $totalRevenue - $totalExpenses;
+    $profitMargin = $totalRevenue > 0 ? (($netProfit / $totalRevenue) * 100) : 0;
+
+    // 2. Generate side-by-side Revenue vs Expense monthly bar graph data layers
+    // We fetch completed aggregates over the current calendar horizon months
+    $monthlyDataRaw = \App\Models\Order::select(
+        \Illuminate\Support\Facades\DB::raw("DATE_FORMAT(created_at, '%b') as month_name"),
+        \Illuminate\Support\Facades\DB::raw("SUM(total_amount) as rev")
+    )
+        ->where('status', 'Completed')
+        ->groupBy('month_name')
+        ->orderByRaw("MIN(created_at)")
+        ->get();
+
+    $chartData = [];
+    $maxVal = 1; // Prevent division by zero errors
+
+    foreach ($monthlyDataRaw as $row) {
+        $rValue = floatval($row->rev);
+        $eValue = $rValue * 0.73; // matching expense simulation scale factors
+
+        if ($rValue > $maxVal) {
+            $maxVal = $rValue;
+        }
+
+        $chartData[] = [
+            'month' => $row->month_name,
+            'rev_value' => $rValue,
+            'exp_value' => $eValue,
+            'rev_height' => ($rValue / $maxVal) * 100,
+            'exp_height' => ($eValue / $maxVal) * 100,
+        ];
+    }
+
+    // Static mockup report history file downloads list array parameters
+    $reportLogs = [
+        ['title' => 'August 2026 Profit & Loss', 'type' => 'Financial', 'date' => 'Sep 3, 2026'],
+        ['title' => 'Q2 Expense Breakdown', 'type' => 'Financial', 'date' => 'Jul 25, 2026'],
+    ];
+
+    return view('reports-financial', compact(
+        'totalRevenue',
+        'totalExpenses',
+        'netProfit',
+        'profitMargin',
+        'chartData',
+        'reportLogs'
+    ));
+})->name('reports.financial');
+
+require __DIR__.'/auth.php';
