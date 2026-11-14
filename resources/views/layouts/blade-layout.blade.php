@@ -17,8 +17,19 @@
         <!-- SIDEBAR PANEL -->
         <aside class="w-64 border-r border-slate-200 p-6 flex flex-col space-y-2 bg-white fixed h-full z-40">
             <div class="mb-8 flex items-center space-x-3">
-                <div class="bg-emerald-600 rounded-full h-5 w-5"></div>
-                <span class="text-lg font-black text-slate-900 tracking-wide">Grocery Admin</span>
+                @php
+                    $storeName = \Illuminate\Support\Facades\Schema::hasTable('settings')
+                        ? (\Illuminate\Support\Facades\DB::table('settings')->value('store_name') ?: 'Grocery Admin')
+                        : 'Grocery Admin';
+                @endphp
+
+                <div class="mb-8 flex items-center space-x-3">
+                    <div class="bg-emerald-600 rounded-full h-5 w-5 shrink-0"></div>
+                    <span class="text-lg font-black text-slate-900 tracking-wide">
+                        {{ $storeName }}
+                    </span>
+                </div>
+
             </div>
 
             <a href="{{ route('dashboard') }}"
