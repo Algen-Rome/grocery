@@ -102,7 +102,7 @@
                                         <input type="checkbox" name="email_notifications" value="1" class="sr-only peer"
                                             @checked($setting->email_notifications)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -113,7 +113,7 @@
                                         <input type="checkbox" name="sms_notifications" value="1" class="sr-only peer"
                                             @checked($setting->sms_notifications)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -134,7 +134,7 @@
                                         <input type="checkbox" name="cod_enabled" value="1" class="sr-only peer"
                                             @checked($setting->cod_enabled)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -145,7 +145,7 @@
                                         <input type="checkbox" name="gcash_enabled" value="1" class="sr-only peer"
                                             @checked($setting->gcash_enabled)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -156,7 +156,7 @@
                                         <input type="checkbox" name="card_enabled" value="1" class="sr-only peer"
                                             @checked($setting->card_enabled)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -167,7 +167,7 @@
                                         <input type="checkbox" name="maya_enabled" value="1" class="sr-only peer"
                                             @checked($setting->maya_enabled)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -226,7 +226,7 @@
                                         <input type="checkbox" name="low_stock_alerts" value="1" class="sr-only peer"
                                             @checked($setting->low_stock_alerts)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -241,7 +241,7 @@
                                         <input type="checkbox" name="refund_request_alerts" value="1" class="sr-only peer"
                                             @checked($setting->refund_request_alerts)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -256,7 +256,7 @@
                                         <input type="checkbox" name="new_order_alerts" value="1" class="sr-only peer"
                                             @checked($setting->new_order_alerts)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -271,7 +271,7 @@
                                         <input type="checkbox" name="daily_sales_summary" value="1" class="sr-only peer"
                                             @checked($setting->daily_sales_summary)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -286,7 +286,7 @@
                                         <input type="checkbox" name="payment_received_alerts" value="1" class="sr-only peer"
                                             @checked($setting->payment_received_alerts)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -301,7 +301,7 @@
                                         <input type="checkbox" name="weekly_report_email" value="1" class="sr-only peer"
                                             @checked($setting->weekly_report_email)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -318,7 +318,7 @@
                                         <input type="checkbox" name="notify_via_email" value="1" class="sr-only peer"
                                             @checked($setting->email_notifications)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -329,7 +329,7 @@
                                         <input type="checkbox" name="notify_via_sms" value="1" class="sr-only peer"
                                             @checked($setting->sms_notifications)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -340,7 +340,7 @@
                                         <input type="checkbox" name="in_app_notifications" value="1" class="sr-only peer"
                                             @checked($setting->in_app_notifications)>
                                         <div
-                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                            class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                         </div>
                                     </label>
                                 </div>
@@ -398,7 +398,7 @@
                                             <input type="checkbox" name="two_factor_enabled" value="1" class="sr-only peer"
                                                 @checked($setting->two_factor_enabled)>
                                             <div
-                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                             </div>
                                         </label>
                                     </div>
@@ -409,7 +409,7 @@
                                             <input type="checkbox" name="login_alert_emails" value="1" class="sr-only peer"
                                                 @checked($setting->login_alert_emails)>
                                             <div
-                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                             </div>
                                         </label>
                                     </div>
@@ -420,7 +420,7 @@
                                             <input type="checkbox" name="auto_logout_idle" value="1" class="sr-only peer"
                                                 @checked($setting->auto_logout_idle)>
                                             <div
-                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                             </div>
                                         </label>
                                     </div>
@@ -431,7 +431,7 @@
                                             <input type="checkbox" name="allow_multiple_devices" value="1"
                                                 class="sr-only peer" @checked($setting->allow_multiple_devices)>
                                             <div
-                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6">
+                                                class="w-12 h-6 bg-[#d1d5db] rounded-full peer peer-checked:bg-[#1b5335] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-3">
                                             </div>
                                         </label>
                                     </div>
