@@ -1,8 +1,47 @@
 @extends('layouts.blade-layout')
 
 @section('content')
-    <!-- KPI Summary Cards Grid Row Block -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <!-- 1. Mobile Page Title & Search Bar -->
+    <div class="lg:hidden mb-5 space-y-3">
+        <h1 class="text-2xl font-extrabold text-slate-900">Dashboard</h1>
+        <input type="text" placeholder="Search..."
+            class="w-full rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#165334]">
+    </div>
+
+    <!-- 2A. Mobile Stacked KPI List (Visible on Mobile Only) -->
+    <div class="md:hidden bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 mb-6 shadow-sm">
+        <div class="flex items-center justify-between px-4 py-3.5">
+            <span class="text-xs font-medium text-slate-600">Total Sales</span>
+            <div class="flex items-center gap-2">
+                <span class="text-base font-extrabold text-slate-900">₱{{ number_format($totalSales ?? 0, 0) }}</span>
+                <span class="text-[11px] font-bold text-emerald-700">{{ $salesTrend ?? '' }}</span>
+            </div>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3.5">
+            <span class="text-xs font-medium text-slate-600">Orders Today</span>
+            <div class="flex items-center gap-2">
+                <span class="text-base font-extrabold text-slate-900">{{ $ordersToday ?? 0 }}</span>
+                <span class="text-[11px] font-bold text-emerald-700">{{ $ordersTrend ?? '' }}</span>
+            </div>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3.5">
+            <span class="text-xs font-medium text-slate-600">Products</span>
+            <div class="flex items-center gap-2">
+                <span class="text-base font-extrabold text-slate-900">{{ number_format($totalProducts ?? 0) }}</span>
+                <span class="text-[11px] font-bold text-rose-500">{{ $lowStockCount ?? 0 }} low</span>
+            </div>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3.5">
+            <span class="text-xs font-medium text-slate-600">Active Customers</span>
+            <div class="flex items-center gap-2">
+                <span class="text-base font-extrabold text-slate-900">{{ $activeCustomers ?? 0 }}</span>
+                <span class="text-[11px] font-bold text-emerald-700">{{ $customerTrend ?? '' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2B. Desktop KPI Summary Cards Grid (Hidden on Mobile, Visible on Desktop) -->
+    <div class="hidden md:grid md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Sales</span>
             <h3 class="text-2xl font-black text-slate-800 mt-2">₱{{ number_format($totalSales ?? 0, 2) }}</h3>
@@ -58,7 +97,6 @@
             <p class="text-xs text-slate-400 font-medium mb-4">Store product inventory reference list</p>
 
             <div class="space-y-3">
-                {{-- 🟢 Standardized to fix editor property validation warnings --}}
                 @forelse($topProducts as $prod)
                     <div>
                         <div
@@ -74,10 +112,45 @@
         </div>
     </div>
 
+
     <!-- Recent Activity Orders Logs -->
-    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4">Recent Orders</h2>
-        <div class="overflow-x-auto">
+    <div class="space-y-3 lg:bg-white lg:p-6 lg:rounded-2xl lg:border lg:border-slate-100 lg:shadow-sm">
+        <h2
+            class="text-base lg:text-xs font-extrabold lg:font-black text-slate-900 lg:text-slate-800 lg:uppercase lg:tracking-wider mb-3 lg:mb-4">
+            Recent Orders
+        </h2>
+
+        <!-- Mobile Stacked Recent Orders Cards (Matches Mockup) -->
+        <div class="lg:hidden bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 shadow-sm">
+            @forelse($orders as $order)
+                <div class="p-4 space-y-2.5 text-xs">
+                    <p class="font-bold text-slate-900 text-sm">#{{ $order->order_number ?? $order->id }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-500 uppercase text-[10px] tracking-wider">CUSTOMER</span>
+                        <span class="font-medium text-slate-800">{{ $order->customer_name }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-500 uppercase text-[10px] tracking-wider">TOTAL</span>
+                        <span class="font-semibold text-slate-800">₱{{ number_format($order->total_amount, 0) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-500 uppercase text-[10px] tracking-wider">STATUS</span>
+                        <span class="font-extrabold text-slate-900">{{ ucfirst(strtolower($order->status)) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-500 uppercase text-[10px] tracking-wider">DATE</span>
+                        <span class="text-slate-600">
+                            {{ $order->created_at ? \Carbon\Carbon::parse($order->created_at)->format('M d, Y') : 'N/A' }}
+                        </span>
+                    </div>
+                </div>
+            @empty
+                <p class="text-xs text-slate-400 text-center py-6 font-bold">No recent checkout logs found.</p>
+            @endforelse
+        </div>
+
+        <!-- Desktop Recent Orders Table (Hidden on Mobile, Visible on Desktop) -->
+        <div class="hidden lg:block overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs font-semibold text-slate-600">
                 <thead>
                     <tr class="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider">
@@ -89,8 +162,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- 🟢 Standardized loop header removes the ?? [] fallback to clear all editor property validation
-                    errors --}}
                     @forelse($orders as $order)
                         <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
                             <td class="py-4 px-4 font-bold text-slate-900">#{{ $order->order_number ?? $order->id }}</td>
@@ -116,6 +187,9 @@
             </table>
         </div>
     </div>
+
+
+
     <script src="https://jsdelivr.net"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

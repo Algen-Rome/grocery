@@ -3,46 +3,46 @@
 @endphp
 
 <!-- ==================== CENTRALIZED REPORT NAVIGATION LINK BAR ==================== -->
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 w-full">
-    <!-- ==================== DYNAMIC CENTRALIZED REPORT NAVIGATION PILLS RIBBON BAR ==================== -->
-    <div class="flex items-center space-x-3 w-full">
+<div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 mb-6 lg:mb-8 w-full">
 
-        <!-- Sales Report (Muted / Unselected Style Example) -->
+    <!-- ==================== DYNAMIC CENTRALIZED REPORT NAVIGATION PILLS RIBBON BAR ==================== -->
+    <div class="grid grid-cols-2 lg:flex lg:items-center gap-2.5 lg:gap-3 w-full lg:w-auto">
+
+        <!-- Sales Report -->
         <a href="{{ route('reports.index') }}"
-            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.index' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
+            class="px-4 lg:px-5 py-3 lg:py-2.5 font-bold rounded-xl lg:rounded-full text-xs shadow-sm transition text-left lg:text-center no-underline {{ $currentRoute === 'reports.index' ? 'bg-[#165334] lg:bg-emerald-800 text-white' : 'bg-white lg:bg-slate-300 text-slate-700 border border-slate-200 lg:border-0 hover:bg-slate-100 lg:hover:bg-slate-400' }}">
             Sales Report
         </a>
 
-        <!-- Inventory Report (Muted / Unselected Base Style) -->
+        <!-- Inventory Report -->
         <a href="{{ route('reports.inventory') }}"
-            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.inventory' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
+            class="px-4 lg:px-5 py-3 lg:py-2.5 font-bold rounded-xl lg:rounded-full text-xs shadow-sm transition text-left lg:text-center no-underline {{ $currentRoute === 'reports.inventory' ? 'bg-[#165334] lg:bg-emerald-800 text-white' : 'bg-white lg:bg-slate-300 text-slate-700 border border-slate-200 lg:border-0 hover:bg-slate-100 lg:hover:bg-slate-400' }}">
             Inventory Report
         </a>
 
-        <!-- Customer Report (Active / Selected High-Contrast Dark Green Style) -->
+        <!-- Customer Report -->
         <a href="{{ route('reports.customer') }}"
-            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.customer' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
+            class="px-4 lg:px-5 py-3 lg:py-2.5 font-bold rounded-xl lg:rounded-full text-xs shadow-sm transition text-left lg:text-center no-underline {{ $currentRoute === 'reports.customer' ? 'bg-[#165334] lg:bg-emerald-800 text-white' : 'bg-white lg:bg-slate-300 text-slate-700 border border-slate-200 lg:border-0 hover:bg-slate-100 lg:hover:bg-slate-400' }}">
             Customer Report
         </a>
 
-        <!-- Financial Report (UPDATED: Restructured wrapper classes to exactly match unselected pills) -->
+        <!-- Financial Report -->
         <a href="{{ route('reports.financial') }}"
-            class="px-5 py-2.5 font-bold rounded-full text-xs shadow-sm transition {{ Route::currentRouteName() === 'reports.financial' ? 'bg-emerald-800 text-white' : 'bg-slate-300 text-slate-700 hover:bg-slate-400' }}">
+            class="px-4 lg:px-5 py-3 lg:py-2.5 font-bold rounded-xl lg:rounded-full text-xs shadow-sm transition text-left lg:text-center no-underline {{ $currentRoute === 'reports.financial' ? 'bg-[#165334] lg:bg-emerald-800 text-white' : 'bg-white lg:bg-slate-300 text-slate-700 border border-slate-200 lg:border-0 hover:bg-slate-100 lg:hover:bg-slate-400' }}">
             Financial Report
         </a>
 
     </div>
 
+    <!-- Action Date Ribbon & Export PDF Button -->
+    <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 w-full lg:w-auto">
+        <span
+            class="text-slate-500 lg:text-slate-700 lg:px-4 lg:py-2.5 lg:bg-slate-200 font-semibold lg:font-bold lg:rounded-lg text-xs lg:shadow-inner">
+            Sep 1 – Sep 14, 2026
+        </span>
 
-    <!-- Action Date Ribbon Layout Summary Section Container -->
-    <!-- 📊 Find this block in layouts/report-nav.blade.php and change your button to an active anchor link route structure: -->
-    <div class="flex items-center gap-3 self-end sm:self-auto">
-        <span class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs shadow-inner">Sep 1 - Sep 14,
-            2026</span>
-
-        <!-- 🌟 LINK FIXED: Triggers the backend export controller generation engine script on click! -->
         <a href="{{ route('reports.inventory.pdf') }}"
-            class="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-black text-xs rounded-lg transition tracking-wide uppercase shadow-sm inline-block text-center no-underline">
+            class="w-full lg:w-auto px-5 py-3.5 lg:py-2.5 bg-[#165334] lg:bg-emerald-800 hover:bg-emerald-900 text-white font-bold lg:font-black text-xs rounded-xl lg:rounded-lg transition tracking-wide lg:uppercase shadow-sm inline-block text-center no-underline whitespace-nowrap">
             Export PDF
         </a>
     </div>

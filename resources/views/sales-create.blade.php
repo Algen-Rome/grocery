@@ -1,29 +1,40 @@
 @extends('layouts.blade-layout')
 
 @section('content')
-    <div class="class=min-h-screen bg-white p-8 font-sans">
-        <div class="mb-4 flex justify-between items-center">
-            <a href="{{ route('sales.index') }}" class="text-xs font-bold hover:text-emerald-200 transition">+ Back to
-                Sales</a>
+    <div class="min-h-screen bg-slate-50 lg:bg-white p-0 lg:p-8 font-sans">
+
+        <!-- Top Back Navigation & Mobile Title -->
+        <div class="mb-4 space-y-2">
+            <h1 class="lg:hidden text-2xl font-extrabold text-slate-900">New sale</h1>
+            <a href="{{ route('sales.index') }}"
+                class="inline-flex items-center text-xs font-bold text-emerald-800 hover:text-emerald-600 transition">
+                ← Back to sales
+            </a>
         </div>
 
         <!-- Backend Form Submission Point -->
         <form action="{{ route('sales.store') }}" method="POST" id="sales-form">
             @csrf
-            <!-- Secure Total Value Hidden Mirror Input -->
             <input type="hidden" name="total_amount" id="form-total-amount" value="0.00" />
 
-            <!-- Main Workspace Two-Column Split Layout Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <!-- Mobile Quick Search Bar (Syncs with Product Selector) -->
+            <div class="lg:hidden mb-4">
+                <input type="text" placeholder="Search product..." onfocus="showProductSelectionRow()"
+                    oninput="showProductSelectionRow(); document.getElementById('posProductSearchInput').value = this.value; handleLiveProductSearch(this.value);"
+                    class="w-full rounded-xl bg-white border border-slate-200 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#165334]" />
+            </div>
 
-                <!-- Left Hand Column Container: Item List Table Segment -->
+            <!-- Main Workspace Two-Column Split Layout Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+
+                <!-- Left Hand Column Container: Item List -->
                 <div class="lg:col-span-2">
                     <h2 class="text-sm font-black text-gray-900 mb-3 tracking-wide">Item in this sale</h2>
 
                     <div
-                        class="bg-white p-6 border border-gray-200 rounded-lg overflow-hidden shadow-sm w-full min-h-[200px] flex flex-col justify-between">
-                        <table class="w-full text-left border-collapse text-xs font-semibold text-slate-700">
-                            <thead>
+                        class="lg:bg-white lg:p-6 lg:border lg:border-gray-200 lg:rounded-lg lg:shadow-sm w-full lg:min-h-[280px] flex flex-col justify-between">
+                        <table class="w-full text-left border-collapse text-xs font-semibold text-slate-700 block lg:table">
+                            <thead class="hidden lg:table-header-group">
                                 <tr
                                     class="border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50/50">
                                     <th class="py-3 px-4">ITEM</th>
@@ -33,35 +44,39 @@
                                     <th class="py-3 px-4 text-right">ACTION</th>
                                 </tr>
                             </thead>
-                            <tbody id="cartTableBody">
-                                <tr id="emptyCartRow">
-                                    <td colspan="5" class="py-6 text-slate-400 font-medium text-center">No items added to
-                                        this transaction record yet.</td>
+                            <tbody id="cartTableBody" class="block lg:table-row-group space-y-3 lg:space-y-0">
+                                <tr id="emptyCartRow"
+                                    class="block lg:table-row bg-white rounded-2xl border border-slate-200 lg:border-0">
+                                    <td colspan="5" class="block lg:table-cell py-6 text-slate-400 font-medium text-center">
+                                        No items added to this transaction record yet.
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <!-- INTERACTIVE SELECTION ROW LINK -->
-                        <div class="mt-auto pt-4 border-t border-gray-100">
+                        <div class="mt-3 lg:mt-auto pt-3 lg:pt-4 lg:border-t lg:border-gray-100">
                             <button type="button" onclick="showProductSelectionRow()"
-                                class="text-emerald-600 hover:text-emerald-700 bg-transparent border-0 p-0 font-bold text-xs cursor-pointer flex items-center space-x-1">
-                                <span>+ Add Product</span>
+                                class="text-[#165334] hover:text-emerald-700 bg-transparent border-0 p-0 font-bold text-xs cursor-pointer flex items-center space-x-1">
+                                <span>+ Add another item</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- HIDDEN DYNAMIC ROW SELECTOR PANEL TEMPLATE -->
+
+                    <!-- DYNAMIC ROW SELECTOR PANEL -->
                     <div id="productSelectorWrapper"
-                        class="hidden mt-4 p-5 bg-slate-50 rounded-xl border border-slate-200/60 w-full relative">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Search
-                            Store Product Item</label>
-                        <div class="flex items-center space-x-4 w-full relative">
+                        class="hidden mt-4 p-4 lg:p-5 bg-white lg:bg-slate-50 rounded-2xl lg:rounded-xl border border-slate-200 w-full relative shadow-sm lg:shadow-none">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">
+                            Search Store Product Item
+                        </label>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full relative">
                             <div class="flex-1 relative">
                                 <input type="text" id="posProductSearchInput"
                                     placeholder="Type a product name to search instantly..."
                                     oninput="handleLiveProductSearch(this.value)"
                                     onfocus="handleLiveProductSearch(this.value)"
-                                    class="w-full bg-white border border-slate-200 rounded-lg p-3 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-500 shadow-inner">
+                                    class="w-full bg-slate-50 lg:bg-white border border-slate-200 rounded-xl lg:rounded-lg p-3 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-500 shadow-inner">
 
                                 <!-- FLOATING RESULTS DROPDOWN PANEL -->
                                 <div id="customDropdownMenu"
@@ -76,77 +91,95 @@
                                                 <div>
                                                     <p class="text-xs font-bold text-slate-900 mb-0.5">{{ $product->name }}</p>
                                                     <p class="text-[10px] text-slate-400 font-semibold">Available Inventory:
-                                                        {{ $product->stock_count }} units</p>
+                                                        {{ $product->stock_count }} units
+                                                    </p>
                                                 </div>
                                                 <span
-                                                    class="text-xs font-black text-emerald-600">₱{{ number_format($product->price, 2) }}</span>
+                                                    class="text-xs font-black text-emerald-700">₱{{ number_format($product->price, 2) }}</span>
                                             </div>
                                         @endforeach
                                     @endif
-                                </div>
-                                <div id="noResultsFoundMessage"
-                                    class="hidden p-4 text-center text-xs font-hold text-slate-400">
-                                    No matching products found in stock registry.
+                                    <div id="noResultsFoundMessage"
+                                        class="hidden p-4 text-center text-xs font-bold text-slate-400">
+                                        No matching products found in stock registry.
+                                    </div>
                                 </div>
                             </div>
+
                             <button type="button" onclick="addCurrentlySelectedProduct()"
-                                class="px-5 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-lg transition border-0 cursor-pointer shadow-sm uppercase tracking-wider whitespace-nowrap">Add
-                                To Sale</button>
+                                class="px-5 py-3.5 bg-[#165334] hover:bg-emerald-800 text-white font-black text-xs rounded-xl lg:rounded-lg transition border-0 cursor-pointer shadow-sm uppercase tracking-wider whitespace-nowrap">
+                                Add to Sale
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Hand Column Container: Order Summary Panel -->
                 <div
-                    class="p-6 rounded-2xl flex flex-col justify-between shadow-sm border border-transparent bg-slate-50 min-h-[380px]">
-                    <div>
-                        <h2 class="text-sm font-black text-gray-900 uppercase tracking-wider mb-4">Order Summary</h2>
+                    class="bg-white lg:bg-slate-50 p-5 lg:p-6 rounded-2xl border border-slate-200 lg:border-transparent flex flex-col justify-between shadow-sm lg:min-h-[380px]">
+                    <div class="space-y-4">
+                        <h2
+                            class="text-base lg:text-sm font-extrabold lg:font-black text-gray-900 lg:uppercase tracking-wide">
+                            Order Summary
+                        </h2>
 
-                        <!-- Customer Input Row -->
-                        <div class="flex justify-between items-center text-xs font-semibold mb-4">
-                            <span class="text-gray-400">Customer</span>
+                        <!-- Customer Input -->
+                        <div
+                            class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-1.5 text-xs font-semibold">
+                            <span class="text-slate-600 lg:text-gray-400 font-bold">Customer Name (Optional)</span>
                             <input type="text" name="customer_name" value="Maria Santos" required
-                                class="bg-transparent border-b border-gray-200 hover:border-gray-400 focus:border-emerald-600 focus:outline-none text-right font-bold text-gray-800 py-0.5 transition w-40" />
+                                class="bg-slate-100 lg:bg-transparent border border-transparent lg:border-gray-200 hover:border-gray-400 focus:border-emerald-600 focus:outline-none text-left lg:text-right font-bold text-gray-900 rounded-xl lg:rounded-none px-3.5 py-2.5 lg:px-1 lg:py-0.5 transition w-full lg:w-48" />
                         </div>
 
                         <!-- Live Metrics Summary Readouts -->
-                        <div class="space-y-3 border-b border-gray-200 pb-3.5 mb-4 text-sm font-semibold text-slate-700">
+                        <div
+                            class="space-y-3 border-b border-gray-200 pb-3.5 text-xs lg:text-sm font-semibold text-slate-700">
                             <div class="flex justify-between">
-                                <span class="text-gray-400">Items</span>
+                                <span class="text-slate-500 lg:text-gray-400">Items</span>
                                 <span id="summary-qty-count" class="text-gray-900 font-black">0</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-gray-400">Subtotal</span>
+                                <span class="text-slate-500 lg:text-gray-400">Subtotal</span>
                                 <span id="summary-subtotal" class="text-gray-900 font-black">₱0.00</span>
                             </div>
                         </div>
 
-                        <div
-                            class="flex justify-between text-sm font-black text-gray-900 border-b border-gray-200 pb-3.5 mb-5">
+                        <div class="flex justify-between text-sm font-black text-gray-900 pb-1">
                             <span>Total</span>
                             <span id="summary-total" class="text-base font-black text-gray-900">₱0.00</span>
                         </div>
 
-                        <!-- Cash Calculator Controls Segment -->
-                        <div class="space-y-3 bg-white p-4 rounded-xl border border-gray-100 mb-6 shadow-inner">
-                            <div class="flex justify-between items-center text-xs font-bold text-gray-600">
+                        <!-- Payment Method Dropdown -->
+                        <div class="space-y-1.5 text-xs font-semibold">
+                            <label class="block text-slate-600 font-bold">Payment Method</label>
+                            <select name="payment_method"
+                                class="w-full bg-slate-100 border border-transparent rounded-xl px-3.5 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-emerald-600">
+                                <option value="Cash">Cash</option>
+                                <option value="GCash">GCash</option>
+                                <option value="Card">Card</option>
+                            </select>
+                        </div>
+
+                        <div
+                            class="space-y-3 lg:bg-white lg:p-4 lg:rounded-xl lg:border lg:border-gray-100 lg:shadow-inner">
+                            <div
+                                class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-1.5 text-xs font-bold text-gray-700">
                                 <span>Amount Received</span>
                                 <input type="number" step="0.01" id="amount-received" oninput="calculateLiveChange()"
-                                    placeholder="₱0.00"
-                                    class="w-24 bg-gray-50 border border-gray-200 rounded-md p-1.5 text-right font-black text-gray-900 focus:outline-none focus:border-emerald-500">
+                                    placeholder="0.00"
+                                    class="w-full lg:w-28 bg-slate-100 lg:bg-gray-50 border border-transparent lg:border-gray-200 rounded-xl lg:rounded-md px-3.5 py-2.5 lg:p-1.5 text-left lg:text-right font-black text-gray-900 focus:outline-none focus:border-emerald-500" />
                             </div>
-                            <div class="flex justify-between items-center text-xs font-bold text-gray-600">
-                                <span>Change Due</span>
-                                <span id="change-display" class="font-black text-emerald-600">₱0.00</span>
+                            <div class="flex justify-between items-center text-xs font-bold text-gray-700 pt-1">
+                                <span>Change</span>
+                                <span id="change-display" class="font-black text-emerald-700 text-sm">₱0.00</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 🌟 SUBMIT TRANSACTION ACTION BUTTON CONTAINER -->
-                    <div>
-                        <button type="submit"
-                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider py-4 rounded-xl transition-all shadow-md transform active:scale-[0.98] cursor-pointer text-center">
-                            Complete Checkout & Deduct Stock
+                    <div class="mt-6">
+                        <button type="submit" id="submit-sale-btn"
+                            class="w-full bg-[#165334] hover:bg-emerald-800 text-white font-black text-xs lg:uppercase tracking-wider py-3.5 lg:py-4 rounded-xl transition-all shadow-md transform active:scale-[0.98] cursor-pointer text-center border-0">
+                            Complete Sale
                         </button>
                     </div>
                 </div>
@@ -154,6 +187,7 @@
             </div>
         </form>
     </div>
+
 
     <!-- ==================== JAVASCRIPT POS CALCULATION ENGINE ==================== -->
     <script>
@@ -170,9 +204,9 @@
             const menu = document.getElementById('customDropdownMenu');
             const items = document.querySelectorAll('.product-search-item');
             const noResults = document.getElementById('noResultsFoundMessage');
-            const cleanQuery = query.toLowerCase().trim();
+            const clearQuery = query.toLowerCase().trim();
 
-            if (cleanQuery === '') {
+            if (clearQuery === '') {
                 if (menu) menu.classList.add('hidden');
                 return;
             }
@@ -182,7 +216,7 @@
 
             items.forEach(item => {
                 const productName = item.getAttribute('data-name');
-                if (productName && productName.includes(cleanQuery)) {
+                if (productName && productName.includes(clearQuery)) {
                     item.classList.remove('hidden');
                     item.classList.add('flex');
                     matches++;
@@ -232,46 +266,48 @@
                 const qtyInput = existingRow.querySelector('.cart-qty-field');
                 if (qtyInput) {
                     qtyInput.value = parseInt(qtyInput.value) + 1;
-                    // 🌟 Sync the matching hidden mirror field
                     const hiddenQty = existingRow.querySelector('.hidden-qty-field');
                     if (hiddenQty) hiddenQty.value = qtyInput.value;
-
-                    updateRowSubtotal(itemId, itemPrice);
                 }
+                updateRowSubtotal(itemId, itemPrice);
                 cleanupPOSSearchState();
                 return;
             }
 
             const row = document.createElement('tr');
             row.id = 'cart-item-' + itemId;
-            row.className = 'border-b border-slate-100 align-middle';
+            row.className = 'block lg:table-row bg-white rounded-2xl lg:rounded-none border border-slate-200 lg:border-0 lg:border-b lg:border-slate-100 p-4 lg:p-0 space-y-2 lg:space-y-0 shadow-sm lg:shadow-none align-middle';
 
-            // 🌟 FIX: Injected hidden form input fields using array brackets [] 
-            // This allows Laravel to read $request->product_id and $request->quantity as arrays!
             row.innerHTML = `
-                    <td class="py-4 px-4 font-bold text-slate-900">
-                        ${itemName}
-                        <input type="hidden" name="product_id[]" value="${itemId}">
-                    </td>
-                    <td class="py-4 px-4">
-                        <input type="number" value="1" min="1" 
-                               oninput="syncHiddenQty(${itemId}, this.value); updateRowSubtotal(${itemId}, ${itemPrice})" 
-                               class="w-16 border border-slate-200 rounded-md p-1 text-center text-xs font-bold text-slate-800 focus:outline-none cart-qty-field">
-                        <input type="hidden" name="quantity[]" value="1" id="hidden-qty-${itemId}" class="hidden-qty-field">
-                    </td>
-                    <td class="py-4 px-4 text-slate-500 font-medium">₱${itemPrice.toFixed(2)}</td>
-                    <td class="py-4 px-4 font-bold text-slate-900 cart-row-subtotal-value" id="subtotal-${itemId}">₱${itemPrice.toFixed(2)}</td>
-                    <td class="py-4 px-4 text-right">
-                        <button type="button" onclick="this.closest('tr').remove(); calculateCartTotals();" class="text-rose-500 hover:text-rose-700 font-bold bg-transparent border-0 cursor-pointer">Remove</button>
-                    </td>
-                `;
+                <td class="block lg:table-cell lg:py-4 lg:px-4 font-bold text-slate-900 text-sm lg:text-xs pb-1 lg:pb-4">
+                    ${itemName}
+                    <input type="hidden" name="product_id[]" value="${itemId}">
+                </td>
+                <td class="flex justify-between items-center lg:table-cell lg:py-4 lg:px-4">
+                    <span class="lg:hidden font-bold text-slate-400 uppercase text-[10px]">QTY</span>
+                    <input type="number" value="1" min="1"
+                        oninput="syncHiddenQty(${itemId}, this.value); updateRowSubtotal(${itemId}, ${itemPrice})"
+                        class="w-16 border border-slate-200 rounded-md p-1 text-right lg:text-center text-xs font-bold text-slate-800 focus:outline-none cart-qty-field">
+                    <input type="hidden" name="quantity[]" value="1" id="hidden-qty-${itemId}" class="hidden-qty-field">
+                </td>
+                <td class="flex justify-between items-center lg:table-cell lg:py-4 lg:px-4 text-slate-600 lg:text-slate-500 font-medium">
+                    <span class="lg:hidden font-bold text-slate-400 uppercase text-[10px]">PRICE</span>
+                    <span>₱${itemPrice.toFixed(2)}</span>
+                </td>
+                <td class="flex justify-between items-center lg:table-cell lg:py-4 lg:px-4 font-bold text-slate-900">
+                    <span class="lg:hidden font-bold text-slate-400 uppercase text-[10px]">SUBTOTAL</span>
+                    <span class="cart-row-subtotal-value" id="subtotal-${itemId}">₱${itemPrice.toFixed(2)}</span>
+                </td>
+                <td class="block lg:table-cell lg:py-4 lg:px-4 text-right pt-1 lg:pt-4">
+                    <button type="button" onclick="this.closest('tr').remove(); calculateCartTotals();"
+                        class="text-rose-500 hover:text-rose-700 font-bold text-xs bg-transparent border-0 cursor-pointer">Remove</button>
+                </td>
+            `;
 
             tbody.appendChild(row);
             cleanupPOSSearchState();
             calculateCartTotals();
         }
-
-        // 🌟 HELPER FUNCTION: Keeps your hidden array quantities synchronized when inputs change
         function syncHiddenQty(id, val) {
             const hiddenInput = document.getElementById('hidden-qty-' + id);
             if (hiddenInput) {
@@ -281,7 +317,7 @@
 
         function cleanupPOSSearchState() {
             const input = document.getElementById('posProductSearchInput');
-            if (input) input.value = "";
+            if (input) input.value = '';
             const wrapper = document.getElementById('productSelectorWrapper');
             if (wrapper) wrapper.classList.add('hidden');
             activeSelectedProduct = null;
@@ -349,101 +385,54 @@
             const amountReceived = parseFloat(amountReceivedInput ? amountReceivedInput.value : 0) || 0;
 
             const changeDisplayField = document.getElementById('change-display');
-            if (changeDisplayField) {
-                if (amountReceived >= totalAmount && totalAmount > 0) {
-                    changeDisplayField.innerText = '₱' + (amountReceived - totalAmount).toFixed(2);
-                } else {
-                    changeDisplayField.innerText = '₱0.00';
-                }
-            }
-        }
-
-        // Close suggestion menu if clicking away
-        document.addEventListener('click', function (event) {
-            const searchContainer = document.getElementById('posProductSearchInput');
-            const customMenu = document.getElementById('customDropdownMenu');
-            if (searchContainer && !searchContainer.contains(event.target) && customMenu) {
-                customMenu.classList.add('hidden');
-            }
-        });
-        function calculateLiveChange(forcedSubtotal = null) {
-            let totalAmount = 0;
-
-            if (forcedSubtotal !== null) {
-                totalAmount = forcedSubtotal;
-            } else {
-                const totalElement = document.getElementById('summary-total');
-                const totalText = totalElement ? totalElement.innerText : '₱0.00';
-                totalAmount = parseFloat(totalText.replace('₱', '').replace(/,/g, '')) || 0;
-            }
-
-            const amountReceivedInput = document.getElementById('amount-received');
-            const amountReceived = parseFloat(amountReceivedInput ? amountReceivedInput.value : 0) || 0;
-
-            const changeDisplayField = document.getElementById('change-display');
             const submitBtn = document.getElementById('submit-sale-btn');
 
             if (changeDisplayField) {
-                // CASE 1: Cart is empty
                 if (totalAmount === 0) {
                     changeDisplayField.innerText = '₱0.00';
                     changeDisplayField.className = 'text-base font-black text-gray-900';
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.className = 'w-full bg-slate-300 text-slate-500 font-black text-sm py-3.5 rounded-xl mt-8 block border-0 cursor-not-allowed text-center';
-                    }
-                }
-                // CASE 2: Insufficient payment amount entered
-                else if (amountReceived < totalAmount) {
+                    if (submitBtn) submitBtn.disabled = true;
+                } else if (amountReceived < totalAmount) {
                     const shortAmount = totalAmount - amountReceived;
-                    changeDisplayField.innerText = 'Short: -₱' + shortAmount.toFixed(2);
-                    // Flash a red warning class onto the text string
-                    changeDisplayField.className = 'text-sm font-black text-rose-600 animate-pulse';
-
-                    // Disable submit button and turn it gray
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.className = 'w-full bg-slate-300 text-slate-500 font-black text-sm py-3.5 rounded-xl mt-8 block border-0 cursor-not-allowed text-center';
-                    }
-                }
-                // CASE 3: Payment is valid and sufficient
-                else {
+                    changeDisplayField.innerText = 'Short: ₱' + shortAmount.toFixed(2);
+                    changeDisplayField.className = 'text-sm font-black text-rose-600';
+                    if (submitBtn) submitBtn.disabled = true;
+                } else {
                     changeDisplayField.innerText = '₱' + (amountReceived - totalAmount).toFixed(2);
-                    changeDisplayField.className = 'text-base font-black text-emerald-600';
-
-                    // Enable button and restore emerald styling state
-                    if (submitBtn) {
-                        submitBtn.disabled = false;
-                        submitBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm py-3.5 rounded-xl shadow-sm mt-8 block border-0 cursor-pointer text-center transition';
-                    }
+                    changeDisplayField.className = 'text-base font-black text-emerald-700';
+                    if (submitBtn) submitBtn.disabled = false;
                 }
             }
         }
+
+        document.addEventListener('click', function (event) {
+            const searchContainer = document.getElementById('posProductSearchInput');
+            const customMenu = document.getElementById('customDropdownMenu');
+            if (searchContainer && !searchContainer.contains(event.target) && customMenu && !customMenu.contains(event.target)) {
+                customMenu.classList.add('hidden');
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             const salesForm = document.getElementById('sales-form');
-
             if (salesForm) {
                 salesForm.addEventListener('submit', function (event) {
-                    // 1. Calculate active total amounts on checkout canvas
                     const totalElement = document.getElementById('summary-total');
                     const totalText = totalElement ? totalElement.innerText : '₱0.00';
                     const totalAmount = parseFloat(totalText.replace('₱', '').replace(/,/g, '')) || 0;
 
-                    // 2. Fetch entered payment amount inputs
                     const amountReceivedInput = document.getElementById('amount-received');
                     const amountReceived = parseFloat(amountReceivedInput ? amountReceivedInput.value : 0) || 0;
 
-                    // 3. Block validation threshold if short
-                    if (amountReceived < totalAmount) {
-                        event.preventDefault(); // Stop form submission immediately
-                        alert('🛑 Cannot complete sale: The amount received (₱' + amountReceived.toFixed(2) + ') is less than the order total (₱' + totalAmount.toFixed(2) + '). Please provide full payment.');
+                    if (totalAmount <= 0) {
+                        event.preventDefault();
+                        alert('Cannot complete sale: There are no items in the checkout cart.');
                         return false;
                     }
 
-                    // 4. Block empty checkout carts
-                    if (totalAmount <= 0) {
+                    if (amountReceived < totalAmount) {
                         event.preventDefault();
-                        alert('🛑 Cannot complete sale: There are no items in the checkout cart ledger.');
+                        alert('Cannot complete sale: The amount received is less than the order total.');
                         return false;
                     }
                 });

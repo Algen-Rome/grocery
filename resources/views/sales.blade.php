@@ -2,14 +2,62 @@
 
 @section('content')
     <div class="flex min-h-screen bg-slate-50">
-
         <!-- Main Content Area Container Workspace -->
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-0 lg:p-8">
 
-            <!-- Unified Control Ribbon Box Component (Dropdown Filters & Aligned Button) -->
+            <!-- MOBILE TOP CONTROLS (Matches Sales Mobile Mockup) -->
+            <div class="lg:hidden space-y-4 mb-6">
+                <h1 class="text-2xl font-extrabold text-slate-900">Sales</h1>
+
+                <!-- Full-Width +New Sale Button -->
+                <a href="{{ route('sales.create') }}"
+                    class="w-full flex justify-center items-center bg-[#165334] hover:bg-[#114229] text-white font-bold text-sm py-3 rounded-xl shadow-sm transition">
+                    +New Sale
+                </a>
+
+                <!-- 2x2 Filter Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <select
+                        class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-600 focus:outline-none focus:border-[#165334]">
+                        <option>Date Range</option>
+                    </select>
+                    <select
+                        class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-600 focus:outline-none focus:border-[#165334]">
+                        <option>Category</option>
+                    </select>
+                    <select
+                        class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-600 focus:outline-none focus:border-[#165334]">
+                        <option>Status</option>
+                    </select>
+                    <input type="text" placeholder="Search orders"
+                        class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#165334]" />
+                </div>
+
+                <!-- 3 Horizontal KPI Cards -->
+                <div class="space-y-2.5">
+                    <div
+                        class="bg-white rounded-2xl border border-slate-200 px-4 py-3.5 flex items-center justify-between shadow-sm">
+                        <span class="text-xs font-medium text-slate-600">Total Revenue</span>
+                        <span
+                            class="text-base font-extrabold text-slate-900">₱{{ number_format($totalRevenue ?? 0, 0) }}</span>
+                    </div>
+                    <div
+                        class="bg-white rounded-2xl border border-slate-200 px-4 py-3.5 flex items-center justify-between shadow-sm">
+                        <span class="text-xs font-medium text-slate-600">Total Orders</span>
+                        <span class="text-base font-extrabold text-slate-900">{{ $totalOrdersCount ?? 0 }}</span>
+                    </div>
+                    <div
+                        class="bg-white rounded-2xl border border-slate-200 px-4 py-3.5 flex items-center justify-between shadow-sm">
+                        <span class="text-xs font-medium text-slate-600">Avg order Value</span>
+                        <span
+                            class="text-base font-extrabold text-slate-900">₱{{ number_format($avgOrderValue ?? 0, 0) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESKTOP UNIFIED CONTROL RIBBON (Hidden on Mobile) -->
             <div
-                class="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4 mb-6 shadow-sm">
-                <!-- Dropdown Fields Layout Elements Row -->
+                class="hidden lg:flex bg-white border border-gray-100 rounded-2xl p-4 flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4 mb-6 shadow-sm">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
                     <select
                         class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-400 focus:outline-none focus:border-emerald-500">
@@ -27,7 +75,6 @@
                         class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-400 placeholder-gray-400 focus:outline-none focus:border-emerald-500" />
                 </div>
 
-                <!-- Action Link Item Aligned Perfectly on the Right Side -->
                 <div class="flex items-center justify-end">
                     <a href="{{ route('sales.create') }}"
                         class="flex justify-center items-center bg-emerald-800 text-white font-black text-sm px-6 py-3 rounded-xl hover:bg-emerald-900 transition tracking-wide shadow-sm whitespace-nowrap w-full sm:w-auto">
@@ -36,29 +83,90 @@
                 </div>
             </div>
 
-            <!-- Summary KPI Analytical Telemetry Panel Card Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- DESKTOP KPI PANEL CARD GRID (Hidden on Mobile) -->
+            <div class="hidden lg:grid md:grid-cols-3 gap-6 mb-8">
                 <div
                     class="bg-gray-100/80 p-6 rounded-2xl border border-gray-200/40 flex flex-col justify-center items-center text-center h-28 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Revenue</p>
-                    <h3 class="text-2xl font-black text-gray-900 mt-1">₱{{ number_format($totalRevenue, 2) }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1">₱{{ number_format($totalRevenue ?? 0, 2) }}</h3>
                 </div>
+
                 <div
                     class="bg-gray-100/80 p-6 rounded-2xl flex flex-col justify-center items-center text-center h-28 border-2 border-emerald-500 relative shadow-sm">
                     <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Total Orders</p>
-                    <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $totalOrdersCount }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $totalOrdersCount ?? 0 }}</h3>
                 </div>
+
                 <div
                     class="bg-gray-100/80 p-6 rounded-2xl border border-gray-200/40 flex flex-col justify-center items-center text-center h-28 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Avg Order Value</p>
-                    <h3 class="text-2xl font-black text-gray-900 mt-1">₱{{ number_format($avgOrderValue, 2) }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1">₱{{ number_format($avgOrderValue ?? 0, 2) }}</h3>
                 </div>
             </div>
 
-            <!-- Detailed Sales Transaction Ledger Database Log Table Sheet -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-sm font-black text-gray-400 uppercase tracking-wider mb-4">Recent Orders</h2>
-                <div class="overflow-x-auto">
+
+            <!-- RECENT ORDERS SECTION -->
+            <div class="lg:bg-white lg:p-6 lg:rounded-2xl lg:shadow-sm lg:border lg:border-gray-100">
+                <h2
+                    class="text-base lg:text-sm font-extrabold lg:font-black text-slate-900 lg:text-gray-400 lg:uppercase tracking-wider mb-3 lg:mb-4">
+                    Recent Orders
+                </h2>
+
+                <!-- Mobile Stacked Order Cards (Matches Mockup) -->
+                <div class="lg:hidden space-y-3">
+                    @forelse($orders as $sale)
+                        <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-2 text-xs shadow-sm">
+                            <p class="font-bold text-slate-900 text-sm">{{ $sale->order_number ?? '#' . $sale->id }}</p>
+                            <p class="font-medium text-slate-700 pb-1">{{ $sale->customer_name }}</p>
+
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-400 uppercase text-[10px]">ITEMS</span>
+                                <span
+                                    class="font-semibold text-slate-800">{{ is_array($sale->items) ? count($sale->items) : '0' }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-400 uppercase text-[10px]">TOTAL</span>
+                                <span class="font-semibold text-slate-800">₱{{ number_format($sale->total_amount, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-400 uppercase text-[10px]">STATUS</span>
+                                <span
+                                    class="font-extrabold text-slate-900">{{ ucfirst(strtolower($sale->status ?? 'Pending')) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-400 uppercase text-[10px]">DATE</span>
+                                <span class="text-slate-600">
+                                    {{ $sale->created_at ? \Carbon\Carbon::parse($sale->created_at)->format('M d, Y') : 'N/A' }}
+                                </span>
+                            </div>
+
+                            <div class="pt-2 flex justify-end items-center gap-4 border-t border-slate-100 mt-2">
+                                <a href="{{ route('sales.show', $sale->id) }}"
+                                    class="text-emerald-700 hover:text-emerald-900 font-bold text-xs">
+                                    View
+                                </a>
+                                <form action="{{ route('sales.destroy', $sale->id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this order?');"
+                                    class="inline m-0 p-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="text-red-500 hover:text-red-700 font-bold text-xs bg-transparent border-0 p-0 cursor-pointer">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <p
+                            class="text-xs text-slate-400 text-center py-6 bg-white rounded-2xl border border-slate-200 font-bold">
+                            No sales records found.
+                        </p>
+                    @endforelse
+                </div>
+
+                <!-- Desktop Sales Table (Hidden on Mobile) -->
+                <div class="hidden lg:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr
@@ -75,29 +183,19 @@
                         <tbody class="divide-y divide-gray-100">
                             @foreach($orders as $sale)
                                 <tr class="hover:bg-slate-50/50 transition text-sm font-semibold text-gray-700">
-
-                                    <!-- Column 1: Order ID Display -->
                                     <td class="py-3.5 px-4 text-gray-400">
                                         {{ $sale->order_number ?? '#' . $sale->id }}
                                     </td>
-
-                                    <!-- Column 2: Customer Name -->
                                     <td class="py-3.5 px-4 text-gray-900 font-bold">
                                         {{ $sale->customer_name }}
                                     </td>
-
-                                    <!-- Column 3: Items Count -->
                                     <td class="py-3.5 px-4 text-gray-500 font-medium">
                                         {{ is_array($sale->items) ? count($sale->items) : '0' }}
                                     </td>
-
-                                    <!-- Column 4: Total Amount -->
                                     <td class="py-3.5 px-4 font-black text-gray-900">
                                         ₱{{ number_format($sale->total_amount, 2) }}
                                     </td>
-
-                                    <!-- Column 5: Status Badge -->
-                                    <td class="py-3.5 px-4 font-semibold text-sm">
+                                    <td class="py-3.5 px-4 text-sm">
                                         @if(strtolower($sale->status ?? 'pending') === 'completed' || strtolower($sale->status ?? '') === 'paid')
                                             <span
                                                 class="inline-block bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wide min-w-[5.5rem] text-center">
@@ -110,23 +208,15 @@
                                             </span>
                                         @endif
                                     </td>
-
-                                    <!-- Column 6: Date -->
                                     <td class="py-3.5 px-4 text-gray-500 font-medium">
                                         {{ $sale->created_at ? \Carbon\Carbon::parse($sale->created_at)->format('M d, Y g:i A') : 'N/A' }}
                                     </td>
-
-                                    <!-- Column 7: Action (Placed exactly at the end to match the ACTION header!) -->
                                     <td class="py-3.5 px-4 text-sm">
                                         <div class="flex items-center gap-3">
-
-                                            <!-- Fixed View Link -->
                                             <a href="{{ route('sales.show', $sale->id) }}"
                                                 class="text-emerald-600 hover:text-emerald-700 transition">
                                                 View
                                             </a>
-
-                                            <!-- Fixed Delete Form Wrapper -->
                                             <form action="{{ route('sales.destroy', $sale->id) }}" method="POST"
                                                 onsubmit="return confirm('Are you sure you want to delete this order?');"
                                                 class="inline m-0 p-0">
@@ -137,16 +227,15 @@
                                                     Delete
                                                 </button>
                                             </form>
-
                                         </div>
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
+
             <!-- 🌟 Floating Order Details Overlay Modal Component Section Layer -->
             <div id="order-details-modal"
                 class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50 transition duration-150 p-4">
